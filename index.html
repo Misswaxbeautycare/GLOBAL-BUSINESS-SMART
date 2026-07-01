@@ -124,7 +124,17 @@ tr:hover td{background:var(--surface2);}
 #install-btn{display:none;position:fixed;bottom:24px;right:24px;z-index:400;background:var(--lime);color:#12140a;border:none;padding:14px 20px;border-radius:50px;font-weight:800;font-size:14px;align-items:center;gap:9px;box-shadow:0 8px 24px rgba(166,189,73,.35);animation:pulse 1.8s infinite;}
 @keyframes pulse{0%,100%{box-shadow:0 8px 24px rgba(166,189,73,.35);transform:scale(1);}50%{box-shadow:0 8px 34px rgba(166,189,73,.6);transform:scale(1.035);}}
 
-@media(max-width:900px){
+.pwrap{position:relative;}
+.pwrap input{padding-right:44px;}
+.peye{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text2);font-size:17px;padding:4px;cursor:pointer;}
+.peye:hover{color:var(--lime2);}
+.trial-banner{background:rgba(217,164,65,.12);border:1px solid var(--warn);border-radius:12px;padding:14px 18px;font-size:13.5px;color:var(--warn);margin-bottom:20px;font-weight:600;}
+#trial-lock{display:none;position:fixed;inset:0;background:var(--bg);z-index:500;align-items:center;justify-content:center;padding:24px;}
+#trial-lock.on{display:flex;}
+.tl-box{max-width:460px;text-align:center;}
+.tl-box h2{font-size:26px;font-weight:800;margin-bottom:12px;}
+.tl-box p{color:var(--text2);font-size:15px;line-height:1.6;margin-bottom:26px;}
+.tl-links{display:flex;flex-direction:column;gap:10px;}
   .pgrid{grid-template-columns:1fr;}
   .sb{transform:translateX(-100%);transition:transform .2s;}
   .sb.open{transform:translateX(0);}
@@ -213,7 +223,7 @@ tr:hover td{background:var(--surface2);}
 
     <div id="pane-login">
       <div class="afield"><label>Email</label><input type="email" id="li-email" placeholder="vous@societe.com"></div>
-      <div class="afield"><label>Mot de passe</label><input type="password" id="li-pass" placeholder="••••••••"></div>
+      <div class="afield"><label>Mot de passe</label><div class="pwrap"><input type="password" id="li-pass" placeholder="••••••••"><button type="button" class="peye" onclick="togglePass('li-pass',this)">👁</button></div></div>
       <div class="aerr" id="li-err"></div>
       <button class="btn btn-lime btn-block" onclick="connexion()">Se connecter</button>
       <button class="btn btn-ghost btn-block" style="margin-top:10px" onclick="motDePasseOublie()">Mot de passe oublié ?</button>
@@ -222,7 +232,7 @@ tr:hover td{background:var(--surface2);}
     <div id="pane-signup" style="display:none">
       <div class="afield"><label>Nom de la société</label><input type="text" id="su-societe" placeholder="Ex: Ma Société SRL"></div>
       <div class="afield"><label>Email</label><input type="email" id="su-email" placeholder="vous@societe.com"></div>
-      <div class="afield"><label>Mot de passe</label><input type="password" id="su-pass" placeholder="8 caractères minimum"></div>
+      <div class="afield"><label>Mot de passe</label><div class="pwrap"><input type="password" id="su-pass" placeholder="8 caractères minimum"><button type="button" class="peye" onclick="togglePass('su-pass',this)">👁</button></div></div>
       <label style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:8px">Formule</label>
       <div class="aplan">
         <div class="aplan-opt on" data-plan="1" onclick="choisirPlan('1',this)">1 pers.<b>75€</b></div>
@@ -258,6 +268,7 @@ tr:hover td{background:var(--surface2);}
     <div class="pv on" id="pg-dashboard">
       <h2 id="dash-titre">Bienvenue</h2>
       <div class="sub">Aperçu de votre espace</div>
+      <div id="dash-trial-banner"></div>
       <div class="card">
         <h3>Votre abonnement</h3>
         <div class="statrow"><span>Formule</span><strong id="dash-plan">—</strong></div>
@@ -282,7 +293,7 @@ tr:hover td{background:var(--surface2);}
       </div>
       <div class="card">
         <h3>Mot de passe</h3>
-        <div class="afield"><label>Nouveau mot de passe</label><input type="password" id="pa-newpass" placeholder="8 caractères minimum"></div>
+        <div class="afield"><label>Nouveau mot de passe</label><div class="pwrap"><input type="password" id="pa-newpass" placeholder="8 caractères minimum"><button type="button" class="peye" onclick="togglePass('pa-newpass',this)">👁</button></div></div>
         <button class="btn btn-ghost btn-sm" onclick="changerMotDePasse()">Mettre à jour le mot de passe</button>
       </div>
       <div class="card">
@@ -312,6 +323,20 @@ tr:hover td{background:var(--surface2);}
   </main>
 </div>
 
+<!-- ===================== ESSAI TERMINÉ ===================== -->
+<div id="trial-lock">
+  <div class="tl-box">
+    <h2>Votre essai gratuit est terminé</h2>
+    <p>Vous avez profité de 7 jours d'essai gratuit. Pour continuer à utiliser Global Business Smart, choisissez une formule ci-dessous.</p>
+    <div class="tl-links">
+      <a class="btn btn-lime btn-block" id="tl-link-1" target="_blank">S'abonner — Solo 75€/mois</a>
+      <a class="btn btn-ghost btn-block" id="tl-link-2" target="_blank">S'abonner — Équipe 150€/mois</a>
+      <a class="btn btn-ghost btn-block" id="tl-link-5" target="_blank">S'abonner — Business 210€/mois</a>
+      <button class="btn btn-ghost btn-block" onclick="deconnexion()">Se déconnecter</button>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 /* ================= CONFIG — À PERSONNALISER ================= */
@@ -332,6 +357,26 @@ var currentCompany = null;
 document.getElementById('stripe-link-1').href = STRIPE_LINK_1;
 document.getElementById('stripe-link-2').href = STRIPE_LINK_2;
 document.getElementById('stripe-link-5').href = STRIPE_LINK_5;
+document.getElementById('tl-link-1').href = STRIPE_LINK_1;
+document.getElementById('tl-link-2').href = STRIPE_LINK_2;
+document.getElementById('tl-link-5').href = STRIPE_LINK_5;
+
+function togglePass(id, btn){
+  var el = document.getElementById(id);
+  if(el.type === 'password'){ el.type = 'text'; btn.textContent = '🙈'; }
+  else { el.type = 'password'; btn.textContent = '👁'; }
+}
+
+function estAdmin(email){
+  return email && email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+}
+function joursRestantsEssai(dateCreation){
+  if(!dateCreation) return 0;
+  var deb = new Date(dateCreation).getTime();
+  var fin = deb + 7*24*60*60*1000;
+  var reste = Math.ceil((fin - Date.now()) / (24*60*60*1000));
+  return reste;
+}
 
 /* ===== AUTH MODAL UI ===== */
 function ouvrirAuth(tab, plan){
@@ -440,9 +485,22 @@ async function chargerApp(){
   document.getElementById('pa-plan-actuel').textContent = PLAN_NOMS[currentCompany.plan]||currentCompany.plan;
   document.getElementById('pa-statut-actuel').innerHTML = STATUT_PILLS[currentCompany.statut_abonnement]||currentCompany.statut_abonnement;
 
-  if(user.email === ADMIN_EMAIL){
+  var admin = estAdmin(user.email);
+  if(admin){
     document.getElementById('nav-admin').style.display='flex';
     chargerAdmin();
+  }
+
+  // Gestion de l'essai gratuit de 7 jours (l'admin n'est jamais bloqué)
+  document.getElementById('trial-lock').classList.remove('on');
+  document.getElementById('dash-trial-banner').innerHTML = '';
+  if(!admin && currentCompany.statut_abonnement === 'essai'){
+    var reste = joursRestantsEssai(currentCompany.date_creation);
+    if(reste <= 0){
+      document.getElementById('trial-lock').classList.add('on');
+    } else {
+      document.getElementById('dash-trial-banner').innerHTML = '<div class="trial-banner">Essai gratuit — il vous reste '+reste+' jour'+(reste>1?'s':'')+'. Rendez-vous dans Paramètres pour vous abonner à tout moment.</div>';
+    }
   }
 }
 
