@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark only">
+<title>Global Business Smart</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#101109">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="GBS">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,900&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#101109; --bg2:#171911; --surface:#1d2016; --surface2:#262a1b;
+  --border:#333726; --border2:#3d4230;
+  --lime:#a6bd49; --lime2:#c4dd5e; --lime-deep:#7c8f35;
+  --text:#f3f1e7; --text2:#9a9a82; --text3:#6c6c58;
+  --danger:#c24545; --warn:#d9a441; --ok:#6fae6f;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+h1,h2,h3,.disp{font-family:'Bricolage Grotesque',sans-serif;}
+a{color:inherit;}
+button{font-family:'Outfit',sans-serif;cursor:pointer;}
+::selection{background:var(--lime);color:#101109;}
+
+/* ===== NAV ===== */
+.nav{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:20px 6vw;background:rgba(16,17,9,.88);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);}
+.logo{font-family:'Bricolage Grotesque',sans-serif;font-weight:900;font-size:19px;letter-spacing:.3px;}
+.logo span{color:var(--lime);}
+.nav-links{display:flex;gap:10px;align-items:center;}
+
+/* ===== BUTTONS ===== */
+.btn{padding:12px 22px;border-radius:10px;border:1px solid transparent;font-size:14.5px;font-weight:700;transition:all .15s;display:inline-flex;align-items:center;gap:8px;}
+.btn-lime{background:var(--lime);color:#12140a;}
+.btn-lime:hover{background:var(--lime2);transform:translateY(-1px);}
+.btn-ghost{background:transparent;border-color:var(--border2);color:var(--text);}
+.btn-ghost:hover{border-color:var(--lime);color:var(--lime2);}
+.btn-danger{background:var(--danger);color:#fff;}
+.btn-sm{padding:8px 14px;font-size:13px;}
+.btn-block{width:100%;justify-content:center;}
+
+/* ===== HERO ===== */
+.hero{padding:8vw 6vw 6vw;position:relative;overflow:hidden;}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border:1px solid var(--border2);border-radius:30px;font-size:12.5px;color:var(--lime2);font-weight:600;margin-bottom:26px;}
+.hero h1{font-size:clamp(38px,6.4vw,74px);font-weight:900;line-height:1.03;letter-spacing:-.02em;max-width:920px;}
+.hero h1 em{font-style:normal;color:var(--lime);}
+.hero p{margin-top:22px;font-size:18px;color:var(--text2);max-width:560px;line-height:1.6;}
+.hero-cta{margin-top:34px;display:flex;gap:14px;flex-wrap:wrap;}
+.seam{height:90px;background:linear-gradient(100deg,var(--bg2) 46%,var(--bg) 46%);margin-top:40px;}
+
+/* ===== PRICING ===== */
+.pricing{padding:2vw 6vw 8vw;background:var(--bg2);}
+.pricing-head{max-width:600px;margin-bottom:44px;}
+.pricing-head .eyebrow{color:var(--lime2);font-weight:700;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;}
+.pricing-head h2{font-size:clamp(26px,3.4vw,38px);font-weight:800;}
+.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+.pcard{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:32px 26px;display:flex;flex-direction:column;position:relative;}
+.pcard.on{border-color:var(--lime);box-shadow:0 0 0 1px var(--lime), 0 20px 50px -20px rgba(166,189,73,.25);}
+.pcard .badge{position:absolute;top:-13px;right:24px;background:var(--lime);color:#12140a;font-size:11px;font-weight:800;padding:5px 12px;border-radius:20px;text-transform:uppercase;letter-spacing:.5px;}
+.pcard .tier{font-size:13px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:1px;}
+.pcard .price{font-family:'Bricolage Grotesque',sans-serif;font-size:44px;font-weight:900;margin:14px 0 4px;}
+.pcard .price small{font-size:15px;color:var(--text2);font-weight:500;}
+.pcard .seats{color:var(--text2);font-size:14px;margin-bottom:22px;}
+.pcard ul{list-style:none;margin-bottom:26px;flex:1;}
+.pcard li{font-size:14px;color:var(--text2);padding:8px 0;border-top:1px solid var(--border);display:flex;gap:9px;align-items:flex-start;}
+.pcard li:first-child{border-top:none;}
+.pcard li .chk{color:var(--lime);flex-shrink:0;}
+
+/* ===== AUTH MODAL ===== */
+.ov{display:none;position:fixed;inset:0;background:rgba(8,9,5,.75);z-index:300;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);}
+.ov.on{display:flex;}
+.amo{background:var(--surface);border:1px solid var(--border2);border-radius:20px;width:420px;max-width:100%;padding:34px;position:relative;}
+.amo .close{position:absolute;top:18px;right:18px;background:none;border:none;color:var(--text2);font-size:22px;}
+.atabs{display:flex;gap:4px;background:var(--surface2);border-radius:10px;padding:4px;margin-bottom:24px;}
+.atab{flex:1;text-align:center;padding:10px;border-radius:8px;font-size:13.5px;font-weight:700;color:var(--text2);border:none;background:none;}
+.atab.on{background:var(--lime);color:#12140a;}
+.afield{margin-bottom:14px;}
+.afield label{font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px;}
+.afield input,.afield select{width:100%;padding:12px 13px;border-radius:9px;border:1px solid var(--border2);background:var(--bg);color:var(--text);font-size:14.5px;}
+.afield input:focus,.afield select:focus{outline:none;border-color:var(--lime);}
+.aerr{font-size:13px;color:var(--danger);margin-top:6px;display:none;}
+.aplan{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;}
+.aplan-opt{border:1px solid var(--border2);border-radius:9px;padding:10px 6px;text-align:center;cursor:pointer;font-size:12px;color:var(--text2);}
+.aplan-opt.on{border-color:var(--lime);color:var(--lime2);background:rgba(166,189,73,.08);}
+.aplan-opt b{display:block;font-size:14px;color:var(--text);margin-top:2px;}
+
+/* ===== APP SHELL ===== */
+#view-app{display:none;}
+.sb{width:250px;background:var(--bg2);position:fixed;top:0;left:0;bottom:0;border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:80;}
+.sb-top{padding:26px 22px;border-bottom:1px solid var(--border);}
+.sb-nav{flex:1;padding:14px;overflow-y:auto;}
+.sn-item{display:flex;align-items:center;gap:11px;padding:12px 14px;border-radius:10px;color:var(--text2);font-size:14.5px;font-weight:600;cursor:pointer;margin-bottom:2px;}
+.sn-item:hover{background:var(--surface);color:var(--text);}
+.sn-item.on{background:var(--lime);color:#12140a;}
+.sb-bottom{padding:16px 22px;border-top:1px solid var(--border);font-size:12.5px;color:var(--text3);}
+.mainv{margin-left:250px;padding:34px 42px;}
+.pv{display:none;}
+.pv.on{display:block;animation:fi .2s ease;}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.pv h2{font-size:26px;font-weight:800;margin-bottom:4px;}
+.pv .sub{color:var(--text2);font-size:14px;margin-bottom:26px;}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:26px;margin-bottom:20px;}
+.card h3{font-size:16px;font-weight:700;margin-bottom:16px;}
+.statrow{display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-top:1px solid var(--border);font-size:14.5px;}
+.statrow:first-child{border-top:none;}
+.pill{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;}
+.pill-actif{background:rgba(111,174,111,.15);color:var(--ok);}
+.pill-essai{background:rgba(217,164,65,.15);color:var(--warn);}
+.pill-impaye{background:rgba(194,69,69,.15);color:var(--danger);}
+.pill-annule{background:var(--surface2);color:var(--text3);}
+
+table{width:100%;border-collapse:collapse;}
+th{text-align:left;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--text2);padding:12px 14px;border-bottom:2px solid var(--border);}
+td{padding:13px 14px;font-size:14px;border-bottom:1px solid var(--border);}
+tr:hover td{background:var(--surface2);}
+
+/* ===== INSTALL BUTTON ===== */
+#install-btn{display:none;position:fixed;bottom:24px;right:24px;z-index:400;background:var(--lime);color:#12140a;border:none;padding:14px 20px;border-radius:50px;font-weight:800;font-size:14px;align-items:center;gap:9px;box-shadow:0 8px 24px rgba(166,189,73,.35);animation:pulse 1.8s infinite;}
+@keyframes pulse{0%,100%{box-shadow:0 8px 24px rgba(166,189,73,.35);transform:scale(1);}50%{box-shadow:0 8px 34px rgba(166,189,73,.6);transform:scale(1.035);}}
+
+@media(max-width:900px){
+  .pgrid{grid-template-columns:1fr;}
+  .sb{transform:translateX(-100%);transition:transform .2s;}
+  .sb.open{transform:translateX(0);}
+  .mainv{margin-left:0;padding:22px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ===================== INSTALL BUTTON ===================== -->
+<button id="install-btn">⬇ Installer l'application</button>
+
+<!-- ===================== LANDING ===================== -->
+<div id="view-landing">
+  <nav class="nav">
+    <div class="logo">GLOBAL <span>BUSINESS</span> SMART</div>
+    <div class="nav-links">
+      <button class="btn btn-ghost btn-sm" onclick="ouvrirAuth('login')">Connexion</button>
+      <button class="btn btn-lime btn-sm" onclick="ouvrirAuth('signup')">Créer un compte</button>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-eyebrow">Gestion d'entreprise multi-sociétés</div>
+    <h1>La gestion de votre société, <em>reliée</em> et sous contrôle.</h1>
+    <p>Un espace privé et sécurisé pour chaque société : ventes, clients, équipe et facturation, accessibles en ligne, à jour en temps réel.</p>
+    <div class="hero-cta">
+      <button class="btn btn-lime" onclick="ouvrirAuth('signup')">Démarrer maintenant</button>
+      <button class="btn btn-ghost" onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'})">Voir les tarifs</button>
+    </div>
+  </section>
+  <div class="seam"></div>
+
+  <section class="pricing" id="pricing">
+    <div class="pricing-head">
+      <div class="eyebrow">Tarifs</div>
+      <h2>Un abonnement mensuel, sans engagement, selon la taille de votre équipe.</h2>
+    </div>
+    <div class="pgrid">
+      <div class="pcard">
+        <div class="tier">Solo</div>
+        <div class="price">75 € <small>/ mois</small></div>
+        <div class="seats">1 utilisateur</div>
+        <ul>
+          <li><span class="chk">✓</span> Accès complet à la gestion</li>
+          <li><span class="chk">✓</span> Ventes, clients, factures</li>
+          <li><span class="chk">✓</span> Support par email</li>
+        </ul>
+        <button class="btn btn-ghost btn-block" onclick="ouvrirAuth('signup','1')">Choisir Solo</button>
+      </div>
+      <div class="pcard on">
+        <div class="badge">Le plus choisi</div>
+        <div class="tier">Équipe</div>
+        <div class="price">150 € <small>/ mois</small></div>
+        <div class="seats">2 utilisateurs</div>
+        <ul>
+          <li><span class="chk">✓</span> Tout Solo, plus :</li>
+          <li><span class="chk">✓</span> 2 comptes utilisateurs</li>
+          <li><span class="chk">✓</span> Gestion des présences & salaires</li>
+        </ul>
+        <button class="btn btn-lime btn-block" onclick="ouvrirAuth('signup','2')">Choisir Équipe</button>
+      </div>
+      <div class="pcard">
+        <div class="tier">Business</div>
+        <div class="price">210 € <small>/ mois</small></div>
+        <div class="seats">5 utilisateurs</div>
+        <ul>
+          <li><span class="chk">✓</span> Tout Équipe, plus :</li>
+          <li><span class="chk">✓</span> 5 comptes utilisateurs</li>
+          <li><span class="chk">✓</span> Support prioritaire</li>
+        </ul>
+        <button class="btn btn-ghost btn-block" onclick="ouvrirAuth('signup','5')">Choisir Business</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ===================== MODALE AUTH ===================== -->
+<div class="ov" id="auth-modal">
+  <div class="amo">
+    <button class="close" onclick="fermerAuth()">×</button>
+    <div class="atabs">
+      <button class="atab" id="tab-login" onclick="switchAuthTab('login')">Connexion</button>
+      <button class="atab" id="tab-signup" onclick="switchAuthTab('signup')">Créer un compte</button>
+    </div>
+
+    <div id="pane-login">
+      <div class="afield"><label>Email</label><input type="email" id="li-email" placeholder="vous@societe.com"></div>
+      <div class="afield"><label>Mot de passe</label><input type="password" id="li-pass" placeholder="••••••••"></div>
+      <div class="aerr" id="li-err"></div>
+      <button class="btn btn-lime btn-block" onclick="connexion()">Se connecter</button>
+      <button class="btn btn-ghost btn-block" style="margin-top:10px" onclick="motDePasseOublie()">Mot de passe oublié ?</button>
+    </div>
+
+    <div id="pane-signup" style="display:none">
+      <div class="afield"><label>Nom de la société</label><input type="text" id="su-societe" placeholder="Ex: Ma Société SRL"></div>
+      <div class="afield"><label>Email</label><input type="email" id="su-email" placeholder="vous@societe.com"></div>
+      <div class="afield"><label>Mot de passe</label><input type="password" id="su-pass" placeholder="8 caractères minimum"></div>
+      <label style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:8px">Formule</label>
+      <div class="aplan">
+        <div class="aplan-opt on" data-plan="1" onclick="choisirPlan('1',this)">1 pers.<b>75€</b></div>
+        <div class="aplan-opt" data-plan="2" onclick="choisirPlan('2',this)">2 pers.<b>150€</b></div>
+        <div class="aplan-opt" data-plan="5" onclick="choisirPlan('5',this)">5 pers.<b>210€</b></div>
+      </div>
+      <div class="aerr" id="su-err"></div>
+      <button class="btn btn-lime btn-block" onclick="inscription()">Créer mon compte</button>
+      <div style="font-size:12.5px;color:var(--text3);margin-top:12px;text-align:center">Un essai gratuit démarre automatiquement. Le paiement se configure ensuite dans Paramètres.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== APP (après connexion) ===================== -->
+<div id="view-app">
+  <nav class="sb">
+    <div class="sb-top">
+      <div class="logo" style="font-size:16px">GLOBAL <span>BUSINESS</span> SMART</div>
+    </div>
+    <div class="sb-nav">
+      <div class="sn-item on" onclick="allerPage('dashboard',this)">Tableau de bord</div>
+      <div class="sn-item" onclick="allerPage('parametres',this)">Paramètres</div>
+      <div class="sn-item" id="nav-admin" style="display:none" onclick="allerPage('admin',this)">Admin</div>
+    </div>
+    <div class="sb-bottom">
+      <div id="sb-email" style="color:var(--text2);margin-bottom:10px;word-break:break-all"></div>
+      <button class="btn btn-ghost btn-sm btn-block" onclick="deconnexion()">Se déconnecter</button>
+    </div>
+  </nav>
+
+  <main class="mainv">
+    <!-- DASHBOARD -->
+    <div class="pv on" id="pg-dashboard">
+      <h2 id="dash-titre">Bienvenue</h2>
+      <div class="sub">Aperçu de votre espace</div>
+      <div class="card">
+        <h3>Votre abonnement</h3>
+        <div class="statrow"><span>Formule</span><strong id="dash-plan">—</strong></div>
+        <div class="statrow"><span>Statut</span><span id="dash-statut">—</span></div>
+        <div class="statrow"><span>Société</span><strong id="dash-societe">—</strong></div>
+      </div>
+      <div class="card">
+        <h3>Prochainement dans votre espace</h3>
+        <div style="color:var(--text2);font-size:14px;line-height:1.7">Les modules de gestion (ventes, clients, stocks, factures) seront ajoutés à cet espace ensuite, chacun isolé et sécurisé pour votre société.</div>
+      </div>
+    </div>
+
+    <!-- PARAMETRES -->
+    <div class="pv" id="pg-parametres">
+      <h2>Paramètres</h2>
+      <div class="sub">Gérez votre compte et votre abonnement</div>
+      <div class="card">
+        <h3>Informations de la société</h3>
+        <div class="afield"><label>Nom de la société</label><input type="text" id="pa-societe"></div>
+        <div class="afield"><label>Email du compte</label><input type="email" id="pa-email" disabled style="opacity:.6"></div>
+        <button class="btn btn-lime btn-sm" onclick="sauverParametres()">Enregistrer</button>
+      </div>
+      <div class="card">
+        <h3>Mot de passe</h3>
+        <div class="afield"><label>Nouveau mot de passe</label><input type="password" id="pa-newpass" placeholder="8 caractères minimum"></div>
+        <button class="btn btn-ghost btn-sm" onclick="changerMotDePasse()">Mettre à jour le mot de passe</button>
+      </div>
+      <div class="card">
+        <h3>Abonnement</h3>
+        <div class="statrow"><span>Formule actuelle</span><strong id="pa-plan-actuel">—</strong></div>
+        <div class="statrow"><span>Statut</span><span id="pa-statut-actuel">—</span></div>
+        <div style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap">
+          <a class="btn btn-ghost btn-sm" id="stripe-link-1" target="_blank">Payer — Solo 75€</a>
+          <a class="btn btn-ghost btn-sm" id="stripe-link-2" target="_blank">Payer — Équipe 150€</a>
+          <a class="btn btn-ghost btn-sm" id="stripe-link-5" target="_blank">Payer — Business 210€</a>
+        </div>
+        <div style="font-size:12.5px;color:var(--text3);margin-top:14px">Après paiement, votre statut sera activé sous 24h. Pour toute question, contactez le support.</div>
+      </div>
+    </div>
+
+    <!-- ADMIN -->
+    <div class="pv" id="pg-admin">
+      <h2>Admin</h2>
+      <div class="sub">Vue globale sur toutes les sociétés inscrites</div>
+      <div class="card">
+        <table>
+          <thead><tr><th>Société</th><th>Email</th><th>Formule</th><th>Statut</th><th>Inscrit le</th><th>Action</th></tr></thead>
+          <tbody id="admin-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* ================= CONFIG — À PERSONNALISER ================= */
+var SUPABASE_URL = 'https://otpnegpmvsmutyhhmkvp.supabase.co';
+var SUPABASE_KEY = 'sb_publishable_TrwWbJEwRijrmgEcNtzOqw_aosdIv_E';
+var ADMIN_EMAIL = 'TON_EMAIL_ADMIN@exemple.com'; // ⚠️ remplace par ton email pour avoir accès à l'onglet Admin
+var STRIPE_LINK_1 = '#'; // ⚠️ colle ici ton lien de paiement Stripe "Solo 75€/mois"
+var STRIPE_LINK_2 = '#'; // ⚠️ colle ici ton lien de paiement Stripe "Équipe 150€/mois"
+var STRIPE_LINK_5 = '#'; // ⚠️ colle ici ton lien de paiement Stripe "Business 210€/mois"
+/* =============================================================== */
+
+var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+var PLAN_NOMS = {'1':'Solo — 1 pers. (75€)','2':'Équipe — 2 pers. (150€)','5':'Business — 5 pers. (210€)'};
+var STATUT_PILLS = {actif:'<span class="pill pill-actif">Actif</span>',essai:'<span class="pill pill-essai">Essai</span>',impaye:'<span class="pill pill-impaye">Impayé</span>',annule:'<span class="pill pill-annule">Annulé</span>'};
+var planChoisi = '1';
+var currentCompany = null;
+
+document.getElementById('stripe-link-1').href = STRIPE_LINK_1;
+document.getElementById('stripe-link-2').href = STRIPE_LINK_2;
+document.getElementById('stripe-link-5').href = STRIPE_LINK_5;
+
+/* ===== AUTH MODAL UI ===== */
+function ouvrirAuth(tab, plan){
+  document.getElementById('auth-modal').classList.add('on');
+  switchAuthTab(tab||'login');
+  if(plan){ document.querySelectorAll('.aplan-opt').forEach(function(o){ o.classList.toggle('on', o.dataset.plan===plan); }); planChoisi = plan; }
+}
+function fermerAuth(){ document.getElementById('auth-modal').classList.remove('on'); }
+function switchAuthTab(tab){
+  document.getElementById('tab-login').classList.toggle('on', tab==='login');
+  document.getElementById('tab-signup').classList.toggle('on', tab==='signup');
+  document.getElementById('pane-login').style.display = tab==='login' ? 'block':'none';
+  document.getElementById('pane-signup').style.display = tab==='signup' ? 'block':'none';
+}
+function choisirPlan(p, el){
+  planChoisi = p;
+  document.querySelectorAll('.aplan-opt').forEach(function(o){ o.classList.remove('on'); });
+  el.classList.add('on');
+}
+
+/* ===== AUTH ACTIONS ===== */
+async function inscription(){
+  var societe = document.getElementById('su-societe').value.trim();
+  var email = document.getElementById('su-email').value.trim();
+  var pass = document.getElementById('su-pass').value;
+  var errEl = document.getElementById('su-err');
+  errEl.style.display='none';
+  if(!societe||!email||!pass){ errEl.textContent='Tous les champs sont requis.'; errEl.style.display='block'; return; }
+  if(pass.length<8){ errEl.textContent='Le mot de passe doit contenir au moins 8 caractères.'; errEl.style.display='block'; return; }
+  var r = await sb.auth.signUp({email:email, password:pass});
+  if(r.error){ errEl.textContent = r.error.message; errEl.style.display='block'; return; }
+  var uid = r.data.user ? r.data.user.id : null;
+  if(uid){
+    await sb.from('gbs_companies').insert({id:uid, nom_societe:societe, email:email, plan:planChoisi, statut_abonnement:'essai'});
+  }
+  fermerAuth();
+  alert('Compte créé ! Si la confirmation par email est activée, vérifiez votre boîte mail avant de vous connecter.');
+}
+
+async function connexion(){
+  var email = document.getElementById('li-email').value.trim();
+  var pass = document.getElementById('li-pass').value;
+  var errEl = document.getElementById('li-err');
+  errEl.style.display='none';
+  var r = await sb.auth.signInWithPassword({email:email, password:pass});
+  if(r.error){ errEl.textContent = r.error.message; errEl.style.display='block'; return; }
+  fermerAuth();
+  await chargerApp();
+}
+
+async function motDePasseOublie(){
+  var email = document.getElementById('li-email').value.trim();
+  if(!email){ alert('Entrez votre email dans le champ ci-dessus, puis cliquez de nouveau.'); return; }
+  var r = await sb.auth.resetPasswordForEmail(email);
+  if(r.error){ alert('Erreur : '+r.error.message); return; }
+  alert('Un email de réinitialisation a été envoyé à '+email+'.');
+}
+
+async function deconnexion(){
+  await sb.auth.signOut();
+  location.reload();
+}
+
+async function changerMotDePasse(){
+  var np = document.getElementById('pa-newpass').value;
+  if(np.length<8){ alert('Le mot de passe doit contenir au moins 8 caractères.'); return; }
+  var r = await sb.auth.updateUser({password:np});
+  if(r.error){ alert('Erreur : '+r.error.message); return; }
+  document.getElementById('pa-newpass').value='';
+  alert('Mot de passe mis à jour.');
+}
+
+/* ===== APP NAV ===== */
+function allerPage(id, el){
+  document.querySelectorAll('.pv').forEach(function(p){ p.classList.remove('on'); });
+  document.querySelectorAll('.sn-item').forEach(function(n){ n.classList.remove('on'); });
+  document.getElementById('pg-'+id).classList.add('on');
+  if(el) el.classList.add('on');
+}
+
+/* ===== CHARGEMENT APP ===== */
+async function chargerApp(){
+  var sess = await sb.auth.getSession();
+  var user = sess.data.session ? sess.data.session.user : null;
+  if(!user){ return; }
+  document.getElementById('view-landing').style.display='none';
+  document.getElementById('view-app').style.display='block';
+  document.getElementById('sb-email').textContent = user.email;
+
+  var r = await sb.from('gbs_companies').select('*').eq('id', user.id).single();
+  currentCompany = r.data;
+  if(!currentCompany){
+    // sécurité : crée la fiche société si absente
+    await sb.from('gbs_companies').insert({id:user.id, nom_societe:'Ma société', email:user.email, plan:'1', statut_abonnement:'essai'});
+    r = await sb.from('gbs_companies').select('*').eq('id', user.id).single();
+    currentCompany = r.data;
+  }
+
+  document.getElementById('dash-titre').textContent = 'Bienvenue, '+(currentCompany.nom_societe||'')+' ';
+  document.getElementById('dash-plan').textContent = PLAN_NOMS[currentCompany.plan]||currentCompany.plan;
+  document.getElementById('dash-statut').innerHTML = STATUT_PILLS[currentCompany.statut_abonnement]||currentCompany.statut_abonnement;
+  document.getElementById('dash-societe').textContent = currentCompany.nom_societe;
+
+  document.getElementById('pa-societe').value = currentCompany.nom_societe||'';
+  document.getElementById('pa-email').value = user.email;
+  document.getElementById('pa-plan-actuel').textContent = PLAN_NOMS[currentCompany.plan]||currentCompany.plan;
+  document.getElementById('pa-statut-actuel').innerHTML = STATUT_PILLS[currentCompany.statut_abonnement]||currentCompany.statut_abonnement;
+
+  if(user.email === ADMIN_EMAIL){
+    document.getElementById('nav-admin').style.display='flex';
+    chargerAdmin();
+  }
+}
+
+async function sauverParametres(){
+  var nom = document.getElementById('pa-societe').value.trim();
+  if(!nom){ alert('Le nom de la société est requis.'); return; }
+  var r = await sb.from('gbs_companies').update({nom_societe:nom}).eq('id', currentCompany.id);
+  if(r.error){ alert('Erreur : '+r.error.message); return; }
+  currentCompany.nom_societe = nom;
+  document.getElementById('dash-societe').textContent = nom;
+  alert('Modifications enregistrées.');
+}
+
+/* ===== ADMIN ===== */
+async function chargerAdmin(){
+  var r = await sb.from('gbs_companies').select('*').order('date_creation',{ascending:false});
+  var el = document.getElementById('admin-tbody');
+  if(r.error || !r.data || !r.data.length){ el.innerHTML='<tr><td colspan="6" style="color:var(--text2)">Aucune société inscrite.</td></tr>'; return; }
+  el.innerHTML = r.data.map(function(c){
+    var d = c.date_creation ? new Date(c.date_creation).toLocaleDateString('fr-FR') : '—';
+    return '<tr><td><strong>'+(c.nom_societe||'—')+'</strong></td><td>'+c.email+'</td><td>'+(PLAN_NOMS[c.plan]||c.plan)+'</td><td>'+(STATUT_PILLS[c.statut_abonnement]||c.statut_abonnement)+'</td><td>'+d+'</td>'+
+      '<td><select onchange="majStatut(\''+c.id+'\',this.value)" style="padding:7px;border-radius:7px;border:1px solid var(--border2);background:var(--bg);color:var(--text)">'+
+      ['essai','actif','impaye','annule'].map(function(s){ return '<option value="'+s+'"'+(s===c.statut_abonnement?' selected':'')+'>'+s+'</option>'; }).join('')+
+      '</select></td></tr>';
+  }).join('');
+}
+async function majStatut(id, statut){
+  var r = await sb.from('gbs_companies').update({statut_abonnement:statut}).eq('id', id);
+  if(r.error){ alert('Erreur : '+r.error.message); return; }
+  chargerAdmin();
+}
+
+/* ===== INSTALLATION PWA ===== */
+var deferredPrompt;
+window.addEventListener('beforeinstallprompt', function(e){
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('install-btn').style.display='flex';
+});
+document.getElementById('install-btn').addEventListener('click', async function(){
+  if(!deferredPrompt) return;
+  deferredPrompt.prompt();
+  await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  document.getElementById('install-btn').style.display='none';
+});
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw.js').catch(function(){});
+}
+
+/* ===== INIT ===== */
+(async function(){
+  var sess = await sb.auth.getSession();
+  if(sess.data.session){ await chargerApp(); }
+})();
+</script>
+</body>
+</html>
