@@ -25,6 +25,19 @@ create table if not exists gbs_companies (
 -- Si la table existait déjà avant l'ajout de la couleur/photo, ajoute les colonnes manquantes :
 alter table gbs_companies add column if not exists couleur text default '#a6bd49';
 alter table gbs_companies add column if not exists photo text;
+alter table gbs_companies add column if not exists mot_passe text;
+
+-- Messages envoyés par les sociétés (Aide / Contact)
+create table if not exists gbs_support_messages (
+  id text primary key,
+  company_id text references gbs_companies(id) on delete cascade,
+  nom_societe text,
+  email text,
+  message text,
+  statut text default 'nouveau',
+  created_at timestamptz default now()
+);
+alter table gbs_support_messages disable row level security;
 
 -- Catégories personnalisées (Boutique, Restaurant, Logement, etc.)
 create table if not exists gbs_categories (

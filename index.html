@@ -81,6 +81,10 @@ button{font-family:'Outfit',sans-serif;cursor:pointer;}
 .afield label{font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px;}
 .afield input,.afield select{width:100%;padding:12px 13px;border-radius:9px;border:1px solid var(--border2);background:var(--bg);color:var(--text);font-size:14.5px;}
 .afield input:focus,.afield select:focus{outline:none;border-color:var(--lime);}
+.pwrap{position:relative;}
+.pwrap input{padding-right:42px;}
+.peye{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text2);font-size:16px;padding:4px;cursor:pointer;}
+.peye:hover{color:var(--lime2);}
 .aerr{font-size:13px;color:var(--danger);margin-top:6px;display:none;}
 .aplan{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;}
 .aplan-opt{border:1px solid var(--border2);border-radius:9px;padding:10px 6px;text-align:center;cursor:pointer;font-size:12px;color:var(--text2);}
@@ -269,11 +273,13 @@ tr:hover td{background:var(--surface2);}
     <div class="amo-sub" id="acces-sous-titre">Entrez l'email de votre société pour continuer.</div>
 
     <div class="afield"><label>Email de la société</label><input type="email" id="ac-email" placeholder="vous@societe.com" autocapitalize="off" autocorrect="off" spellcheck="false"></div>
+    <div class="afield" id="ac-pass-wrap" style="display:none"><label>Mot de passe</label><div class="pwrap"><input type="password" id="ac-pass" placeholder="Votre mot de passe"><button type="button" class="peye" onclick="togglePass('ac-pass',this)">👁</button></div></div>
     <div class="aerr" id="ac-err"></div>
     <button class="btn btn-lime btn-block" id="ac-continuer-btn" onclick="continuerAcces()">Continuer</button>
 
     <div id="ac-nouveau" style="display:none;margin-top:16px">
       <div class="afield"><label>Nom de la société</label><input type="text" id="ac-societe" placeholder="Ex: Ma Société SRL"></div>
+      <div class="afield"><label>Créer un mot de passe</label><div class="pwrap"><input type="password" id="ac-pass-nouveau" placeholder="Votre mot de passe"><button type="button" class="peye" onclick="togglePass('ac-pass-nouveau',this)">👁</button></div></div>
       <label style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:8px">Formule</label>
       <div class="aplan">
         <div class="aplan-opt on" data-plan="1" onclick="choisirPlan('1',this)">1 pers.<b>75€</b></div>
@@ -344,7 +350,9 @@ tr:hover td{background:var(--surface2);}
       <div class="sn-item" onclick="allerPage('presences',this)">Présences</div>
       <div class="sn-item" onclick="allerPage('salaires',this)">Salaires</div>
       <div class="sn-item" onclick="allerPage('parametres',this)">Paramètres</div>
+      <div class="sn-item" onclick="allerPage('aide',this)">Aide / Contact</div>
       <div class="sn-item" id="nav-admin" style="display:none" onclick="allerPage('admin',this)">Admin</div>
+      <div class="sn-item" id="nav-messages" style="display:none" onclick="allerPageAdminMessages()">Messages reçus</div>
     </div>
     <div class="sb-bottom">
       <div id="sb-email" style="color:var(--text2);margin-bottom:10px;word-break:break-all"></div>
@@ -567,6 +575,12 @@ tr:hover td{background:var(--surface2);}
           <div class="afield"><label>Email de la société</label><input type="email" id="pa-email" disabled style="opacity:.6"></div>
           <button class="btn btn-lime btn-sm" onclick="sauverParametres()">Enregistrer</button>
         </div>
+        <div class="card">
+          <h3>Mot de passe</h3>
+          <div class="sub" id="pa-mdp-statut" style="margin-bottom:14px"></div>
+          <div class="afield"><label>Nouveau mot de passe</label><div class="pwrap"><input type="password" id="pa-mdp" placeholder="Votre mot de passe"><button type="button" class="peye" onclick="togglePass('pa-mdp',this)">👁</button></div></div>
+          <button class="btn btn-lime btn-sm" onclick="sauverMotDePasse()">Enregistrer le mot de passe</button>
+        </div>
       </div>
 
       <div class="param-onglet" id="po-apparence" style="display:none">
@@ -621,11 +635,39 @@ tr:hover td{background:var(--surface2);}
       <div class="sub">Vue globale sur toutes les sociétés inscrites</div>
       <div class="card">
         <table>
-          <thead><tr><th>Société</th><th>Email</th><th>Formule</th><th>Statut</th><th>Inscrit le</th><th>Action</th></tr></thead>
+          <thead><tr><th>Société</th><th>Email</th><th>Formule</th><th>Statut</th><th>Inscrit le</th><th>Action</th><th></th></tr></thead>
           <tbody id="admin-tbody"></tbody>
         </table>
       </div>
     </div>
+
+    <!-- AIDE / CONTACT (société) -->
+    <div class="pv" id="pg-aide">
+      <h2>Aide / Contact</h2>
+      <div class="sub">Un souci, une question ? Écrivez-nous, nous vous répondrons par email.</div>
+      <div class="card">
+        <div class="afield full"><label>Votre message</label><textarea id="aide-message" rows="5" placeholder="Décrivez votre souci le plus précisément possible..."></textarea></div>
+        <button class="btn btn-lime btn-sm" onclick="envoyerMessageAide()">Envoyer le message</button>
+      </div>
+      <div class="card">
+        <h3>Vos messages précédents</h3>
+        <div id="aide-historique"></div>
+      </div>
+    </div>
+
+    <!-- MESSAGES REÇUS (admin) -->
+    <div class="pv" id="pg-messages-admin">
+      <h2>Messages reçus</h2>
+      <div class="sub">Tous les messages envoyés par les sociétés inscrites</div>
+      <div class="card"><div id="messages-admin-liste"></div></div>
+    </div>
+
+    <!-- DIAGNOSTIC SOCIÉTÉ (admin) -->
+    <div class="ov" id="m-diagnostic"><div class="mo">
+      <div class="mh"><div class="mti">Aperçu de la société</div><button class="bx" onclick="fermerM('m-diagnostic')">×</button></div>
+      <div class="mb" id="diagnostic-body"></div>
+      <div class="mf"><button class="btn btn-ghost" onclick="fermerM('m-diagnostic')">Fermer</button></div>
+    </div></div>
   </main>
 </div>
 
@@ -851,12 +893,26 @@ async function partagerApp(){
 }
 
 /* ===== MODALE ACCÈS ===== */
+var companyEnAttenteMdp = null;
+
+function togglePass(id, btn){
+  var el = document.getElementById(id);
+  if(el.type === 'password'){ el.type = 'text'; btn.textContent = '🙈'; }
+  else { el.type = 'password'; btn.textContent = '👁'; }
+}
+
 function ouvrirAcces(plan){
   document.getElementById('acces-modal').classList.add('on');
   document.getElementById('ac-nouveau').style.display='none';
   document.getElementById('ac-continuer-btn').style.display='flex';
   document.getElementById('ac-email').value='';
+  document.getElementById('ac-email').disabled=false;
+  document.getElementById('ac-pass-wrap').style.display='none';
+  document.getElementById('ac-pass').value='';
+  document.getElementById('ac-pass-nouveau').value='';
   document.getElementById('ac-err').style.display='none';
+  document.getElementById('acces-sous-titre').textContent = 'Entrez l\'email de votre société pour continuer.';
+  companyEnAttenteMdp = null;
   if(plan){ planChoisi = plan; }
 }
 function fermerAcces(){ document.getElementById('acces-modal').classList.remove('on'); }
@@ -867,16 +923,37 @@ function choisirPlan(p, el){
 }
 
 async function continuerAcces(){
-  var email = document.getElementById('ac-email').value.trim().toLowerCase();
   var errEl = document.getElementById('ac-err');
   errEl.style.display='none';
+
+  if(companyEnAttenteMdp){
+    var pass = document.getElementById('ac-pass').value;
+    if(!pass){ errEl.textContent='Entrez votre mot de passe.'; errEl.style.display='block'; return; }
+    if(pass !== companyEnAttenteMdp.mot_passe){ errEl.textContent='Mot de passe incorrect.'; errEl.style.display='block'; return; }
+    localStorage.setItem('gbs_company_id', companyEnAttenteMdp.id);
+    var c = companyEnAttenteMdp; companyEnAttenteMdp = null;
+    fermerAcces();
+    entrerDansEspace(c);
+    return;
+  }
+
+  var email = document.getElementById('ac-email').value.trim().toLowerCase();
   if(!email){ errEl.textContent='Entrez un email.'; errEl.style.display='block'; return; }
   var r = await sb.from('gbs_companies').select('*').eq('email', email).maybeSingle();
   if(r.error){ errEl.textContent='Erreur : '+r.error.message; errEl.style.display='block'; return; }
   if(r.data){
-    localStorage.setItem('gbs_company_id', r.data.id);
-    fermerAcces();
-    entrerDansEspace(r.data);
+    var comp = r.data;
+    if(comp.mot_passe){
+      companyEnAttenteMdp = comp;
+      document.getElementById('ac-pass-wrap').style.display='block';
+      document.getElementById('acces-sous-titre').textContent = 'Entrez votre mot de passe pour continuer.';
+      document.getElementById('ac-email').disabled = true;
+    } else {
+      localStorage.setItem('gbs_company_id', comp.id);
+      fermerAcces();
+      entrerDansEspace(comp);
+      setTimeout(function(){ alert('Pensez à créer un mot de passe dans Paramètres pour sécuriser votre espace.'); }, 500);
+    }
   } else {
     document.getElementById('ac-nouveau').style.display='block';
     document.getElementById('ac-continuer-btn').style.display='none';
@@ -886,11 +963,13 @@ async function continuerAcces(){
 async function creerEspace(){
   var email = document.getElementById('ac-email').value.trim().toLowerCase();
   var societe = document.getElementById('ac-societe').value.trim();
+  var pass = document.getElementById('ac-pass-nouveau').value;
   var errEl = document.getElementById('ac-err');
   errEl.style.display='none';
   if(!societe){ errEl.textContent='Le nom de la société est requis.'; errEl.style.display='block'; return; }
+  if(!pass){ errEl.textContent='Créez un mot de passe.'; errEl.style.display='block'; return; }
   var id = 'c_'+Date.now().toString(36)+Math.random().toString(36).substr(2,7);
-  var nouveau = {id:id, nom_societe:societe, email:email, plan:planChoisi, statut_abonnement:'essai', date_creation:new Date().toISOString()};
+  var nouveau = {id:id, nom_societe:societe, email:email, mot_passe:pass, plan:planChoisi, statut_abonnement:'essai', date_creation:new Date().toISOString()};
   var r = await sb.from('gbs_companies').insert(nouveau);
   if(r.error){ errEl.textContent='Erreur : '+r.error.message; errEl.style.display='block'; return; }
   localStorage.setItem('gbs_company_id', id);
@@ -922,6 +1001,7 @@ function verifierAdmin(){
     document.getElementById('view-app').style.display='block';
     document.getElementById('sb-email').textContent = 'Connectée en tant qu\'admin';
     document.getElementById('nav-admin').style.display='flex';
+    document.getElementById('nav-messages').style.display='flex';
     document.querySelectorAll('.sn-item').forEach(function(n){ n.classList.remove('on'); });
     allerPage('admin', document.getElementById('nav-admin'));
     chargerAdmin();
@@ -954,6 +1034,7 @@ function entrerDansEspace(company){
   document.getElementById('view-landing').style.display='none';
   document.getElementById('view-app').style.display='block';
   document.getElementById('sb-email').textContent = modeDemo ? 'Mode démonstration' : company.email;
+  document.getElementById('pa-mdp-statut').textContent = company.mot_passe ? 'Un mot de passe est déjà défini pour cet espace.' : 'Aucun mot de passe défini — créez-en un pour sécuriser votre espace.';
 
   document.getElementById('dash-titre').textContent = 'Bienvenue, '+(company.nom_societe||'');
   document.getElementById('dash-plan').textContent = PLAN_NOMS[company.plan]||company.plan;
@@ -1004,12 +1085,25 @@ async function sauverParametres(){
   alert('Modifications enregistrées.');
 }
 
+async function sauverMotDePasse(){
+  var pass = document.getElementById('pa-mdp').value;
+  if(!pass){ alert('Entrez un mot de passe.'); return; }
+  if(modeDemo){ alert('Mode démo : le mot de passe n\'est pas enregistré.'); return; }
+  var r = await sb.from('gbs_companies').update({mot_passe:pass}).eq('id', currentCompany.id);
+  if(r.error){ alert('Erreur : '+r.error.message); return; }
+  currentCompany.mot_passe = pass;
+  document.getElementById('pa-mdp').value='';
+  document.getElementById('pa-mdp-statut').textContent = 'Mot de passe défini.';
+  alert('Mot de passe enregistré.');
+}
+
 /* ===== MOTEUR DE DONNÉES (scindé par société) ===== */
 var TABLE_MAP = {
   produits:'gbs_produits', ventes:'gbs_ventes', depenses:'gbs_depenses',
   employes:'gbs_employes', presences:'gbs_presences', clients:'gbs_clients',
   factures:'gbs_factures', mm:'gbs_mobilemoney', carte:'gbs_carte',
-  paiementsSalaires:'gbs_paiements_salaires', categories:'gbs_categories'
+  paiementsSalaires:'gbs_paiements_salaires', categories:'gbs_categories',
+  messages:'gbs_support_messages'
 };
 var FIELD_MAP = {
   produits:{prixAchat:'prix_achat', stockMin:'stock_min', companyId:'company_id'},
@@ -1022,12 +1116,13 @@ var FIELD_MAP = {
   mm:{num:'numero', companyId:'company_id'},
   carte:{companyId:'company_id'},
   paiementsSalaires:{empId:'emp_id', date:'date_paiement', companyId:'company_id'},
-  categories:{companyId:'company_id'}
+  categories:{companyId:'company_id'},
+  messages:{nomSociete:'nom_societe', companyId:'company_id'}
 };
 function toRow(key, obj){ var map=FIELD_MAP[key]||{}; var row={}; for(var k in obj){ row[map[k]||k]=obj[k]; } return row; }
 function fromRow(key, row){ var map=FIELD_MAP[key]||{}; var inv={}; for(var k in map) inv[map[k]]=k; var obj={}; for(var k in row){ if(k==='created_at') continue; obj[inv[k]||k]=row[k]; } return obj; }
 
-var CACHE = {produits:[],ventes:[],depenses:[],employes:[],presences:[],clients:[],factures:[],mm:[],carte:[],paiementsSalaires:[],categories:[]};
+var CACHE = {produits:[],ventes:[],depenses:[],employes:[],presences:[],clients:[],factures:[],mm:[],carte:[],paiementsSalaires:[],categories:[],messages:[]};
 var DB = { get:function(k){ return CACHE[k]||[]; }, id:function(){ return 'x_'+Date.now().toString(36)+Math.random().toString(36).substr(2,6); } };
 
 async function sbInsert(key, obj){
@@ -1612,6 +1707,7 @@ function rafraichir(page){
   else if(page==='mobilemoney') afficherMM();
   else if(page==='carte') afficherCarte();
   else if(page==='whatsapp') afficherWhatsapp();
+  else if(page==='aide') afficherAide();
 }
 
 /* ===== CATÉGORIES ===== */
@@ -1743,19 +1839,87 @@ function majBadgeEssai(){
 async function chargerAdmin(){
   var r = await sb.from('gbs_companies').select('*').order('date_creation',{ascending:false});
   var el = document.getElementById('admin-tbody');
-  if(r.error || !r.data || !r.data.length){ el.innerHTML='<tr><td colspan="6" style="color:var(--text2)">Aucune société inscrite.</td></tr>'; return; }
+  if(r.error || !r.data || !r.data.length){ el.innerHTML='<tr><td colspan="7" style="color:var(--text2)">Aucune société inscrite.</td></tr>'; return; }
   el.innerHTML = r.data.map(function(c){
     var d = c.date_creation ? new Date(c.date_creation).toLocaleDateString('fr-FR') : '—';
     return '<tr><td><strong>'+(c.nom_societe||'—')+'</strong></td><td>'+c.email+'</td><td>'+(PLAN_NOMS[c.plan]||c.plan)+'</td><td>'+(STATUT_PILLS[c.statut_abonnement]||c.statut_abonnement)+'</td><td>'+d+'</td>'+
       '<td><select onchange="majStatut(\''+c.id+'\',this.value)" style="padding:7px;border-radius:7px;border:1px solid var(--border2);background:var(--bg);color:var(--text)">'+
       ['essai','actif','impaye','annule'].map(function(s){ return '<option value="'+s+'"'+(s===c.statut_abonnement?' selected':'')+'>'+s+'</option>'; }).join('')+
-      '</select></td></tr>';
+      '</select></td><td><button class="btn btn-ghost btn-sm" onclick="voirDiagnosticSociete(\''+c.id+'\',\''+(c.nom_societe||'').replace(/'/g,"")+'\')">Voir les données</button></td></tr>';
   }).join('');
 }
 async function majStatut(id, statut){
   var r = await sb.from('gbs_companies').update({statut_abonnement:statut}).eq('id', id);
   if(r.error){ alert('Erreur : '+r.error.message); return; }
   chargerAdmin();
+}
+
+/* ===== AIDE / CONTACT (côté société) ===== */
+async function envoyerMessageAide(){
+  var texte = document.getElementById('aide-message').value.trim();
+  if(!texte){ alert('Écrivez votre message d\'abord.'); return; }
+  if(modeDemo){ alert('Mode démo : les messages ne sont pas envoyés.'); return; }
+  var m = {id:DB.id(), nomSociete:currentCompany.nom_societe, email:currentCompany.email, message:texte, statut:'nouveau'};
+  CACHE.messages.unshift(m); await sbInsert('messages', m);
+  document.getElementById('aide-message').value='';
+  alert('Message envoyé. Nous vous répondrons par email dès que possible.');
+  afficherAide();
+}
+function afficherAide(){
+  var el = document.getElementById('aide-historique');
+  var mine = DB.get('messages');
+  if(!mine.length){ el.innerHTML = '<div class="vide"><div class="vide-txt">Aucun message envoyé pour le moment</div></div>'; return; }
+  el.innerHTML = mine.map(function(m){ return '<div class="statrow"><span>'+fmtDate(m.date||new Date())+' — '+m.message.slice(0,80)+(m.message.length>80?'...':'')+'</span><span class="pill '+(m.statut==='repondu'?'pill-actif':'pill-essai')+'">'+(m.statut==='repondu'?'Répondu':'En attente')+'</span></div>'; }).join('');
+}
+
+/* ===== MESSAGES REÇUS (admin) ===== */
+function allerPageAdminMessages(){
+  document.querySelectorAll('.pv').forEach(function(p){ p.classList.remove('on'); });
+  document.querySelectorAll('.sn-item').forEach(function(n){ n.classList.remove('on'); });
+  document.getElementById('pg-messages-admin').classList.add('on');
+  document.getElementById('nav-messages').classList.add('on');
+  fermerMenuMobile();
+  chargerMessagesAdmin();
+}
+async function chargerMessagesAdmin(){
+  var r = await sb.from('gbs_support_messages').select('*').order('created_at',{ascending:false});
+  var el = document.getElementById('messages-admin-liste');
+  if(r.error || !r.data || !r.data.length){ el.innerHTML = '<div class="vide"><div class="vide-txt">Aucun message reçu</div></div>'; return; }
+  el.innerHTML = '<table><thead><tr><th>Société</th><th>Email</th><th>Message</th><th>Date</th><th>Statut</th><th></th></tr></thead><tbody>'+
+    r.data.map(function(m){
+      var d = m.created_at ? new Date(m.created_at).toLocaleDateString('fr-FR') : '—';
+      return '<tr><td><strong>'+(m.nom_societe||'—')+'</strong></td><td>'+m.email+'</td><td style="max-width:280px">'+m.message+'</td><td>'+d+'</td><td>'+(m.statut==='repondu'?'<span class="pill pill-actif">Répondu</span>':'<span class="pill pill-essai">Nouveau</span>')+'</td>'+
+      '<td><div class="actrow"><button class="btn btn-lime btn-sm" onclick="repondreMessage(\''+m.email+'\',\''+m.id+'\')">Répondre</button></div></td></tr>';
+    }).join('')+'</tbody></table>';
+}
+async function repondreMessage(email, id){
+  window.open('mailto:'+email+'?subject='+encodeURIComponent('Réponse — Global Business Smart')+'&body='+encodeURIComponent('Bonjour,\n\n'));
+  await sb.from('gbs_support_messages').update({statut:'repondu'}).eq('id', id);
+  chargerMessagesAdmin();
+}
+
+/* ===== DIAGNOSTIC D'UNE SOCIÉTÉ (admin) ===== */
+async function voirDiagnosticSociete(companyId, nomSociete){
+  ouvrirM('m-diagnostic');
+  var body = document.getElementById('diagnostic-body');
+  body.innerHTML = '<div style="text-align:center;color:var(--text2);padding:20px">Chargement...</div>';
+  var [ventes, produits, clients, factures] = await Promise.all([
+    sb.from('gbs_ventes').select('*').eq('company_id', companyId),
+    sb.from('gbs_produits').select('*').eq('company_id', companyId),
+    sb.from('gbs_clients').select('*').eq('company_id', companyId),
+    sb.from('gbs_factures').select('*').eq('company_id', companyId)
+  ]);
+  var nbVentes = (ventes.data||[]).length;
+  var totalVentes = (ventes.data||[]).filter(function(v){return v.statut==='paye';}).reduce(function(s,v){return s+(v.total||0);},0);
+  var derniereVente = (ventes.data||[])[0];
+  body.innerHTML = '<h3 style="margin-bottom:16px">'+nomSociete+'</h3>'+
+    '<div class="statrow"><span>Nombre de ventes</span><strong>'+nbVentes+'</strong></div>'+
+    '<div class="statrow"><span>Chiffre d\'affaires enregistré</span><strong>'+fmt(totalVentes)+'</strong></div>'+
+    '<div class="statrow"><span>Articles au catalogue</span><strong>'+(produits.data||[]).length+'</strong></div>'+
+    '<div class="statrow"><span>Clients enregistrés</span><strong>'+(clients.data||[]).length+'</strong></div>'+
+    '<div class="statrow"><span>Factures générées</span><strong>'+(factures.data||[]).length+'</strong></div>'+
+    '<div class="statrow"><span>Dernière vente</span><strong>'+(derniereVente ? fmtDate(derniereVente.date) : 'Aucune')+'</strong></div>'+
+    (nbVentes===0 ? '<div class="trial-banner" style="margin-top:16px">Cette société n\'a encore enregistré aucune vente — elle a peut-être besoin d\'aide pour démarrer.</div>' : '');
 }
 
 /* ===== INSTALLATION PWA ===== */
