@@ -191,6 +191,7 @@ tr:hover td{background:var(--surface2);}
   <nav class="nav">
     <div class="logo">GLOBAL <span>BUSINESS</span> SMART</div>
     <div class="nav-links">
+      <button class="btn btn-ghost btn-sm" onclick="partagerApp()">Partager</button>
       <button class="btn btn-ghost btn-sm" onclick="voirDemo()">Voir la démo</button>
       <button class="btn btn-lime btn-sm" onclick="ouvrirAcces()">Accéder à mon espace</button>
     </div>
@@ -203,6 +204,13 @@ tr:hover td{background:var(--surface2);}
     <div class="hero-cta">
       <button class="btn btn-lime" onclick="ouvrirAcces()">Démarrer maintenant</button>
       <button class="btn btn-ghost" onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'})">Voir les tarifs</button>
+    </div>
+    <div style="margin-top:22px">
+      <a onclick="toggleInstallHelp()" style="color:var(--lime2);font-size:13.5px;font-weight:700;cursor:pointer;text-decoration:underline">Comment installer l'application sur mon téléphone ?</a>
+      <div id="install-help" style="display:none;margin-top:14px;max-width:560px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 20px;font-size:13.5px;color:var(--text2);line-height:1.7">
+        <strong style="color:var(--text)">Sur Android (Chrome) :</strong> ouvrez ce site, puis appuyez sur le bouton "Installer l'application" qui clignote en bas de l'écran. S'il n'apparaît pas, ouvrez le menu ⋮ de Chrome puis "Installer l'application".<br><br>
+        <strong style="color:var(--text)">Sur iPhone (Safari) :</strong> ouvrez ce site dans Safari, appuyez sur le bouton Partager (carré avec flèche vers le haut), puis choisissez "Sur l'écran d'accueil".
+      </div>
     </div>
   </section>
   <div class="seam"></div>
@@ -227,7 +235,7 @@ tr:hover td{background:var(--surface2);}
       <div class="pcard on">
         <div class="badge">Le plus choisi</div>
         <div class="tier">Équipe</div>
-        <div class="price">150 € <small>/ mois</small></div>
+        <div class="price">125 € <small>/ mois</small></div>
         <div class="seats">2 utilisateurs</div>
         <ul>
           <li><span class="chk">✓</span> Tout Solo, plus :</li>
@@ -260,7 +268,7 @@ tr:hover td{background:var(--surface2);}
     <h3 id="acces-titre">Accéder à mon espace</h3>
     <div class="amo-sub" id="acces-sous-titre">Entrez l'email de votre société pour continuer.</div>
 
-    <div class="afield"><label>Email de la société</label><input type="email" id="ac-email" placeholder="vous@societe.com"></div>
+    <div class="afield"><label>Email de la société</label><input type="email" id="ac-email" placeholder="vous@societe.com" autocapitalize="off" autocorrect="off" spellcheck="false"></div>
     <div class="aerr" id="ac-err"></div>
     <button class="btn btn-lime btn-block" id="ac-continuer-btn" onclick="continuerAcces()">Continuer</button>
 
@@ -269,7 +277,7 @@ tr:hover td{background:var(--surface2);}
       <label style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:8px">Formule</label>
       <div class="aplan">
         <div class="aplan-opt on" data-plan="1" onclick="choisirPlan('1',this)">1 pers.<b>75€</b></div>
-        <div class="aplan-opt" data-plan="2" onclick="choisirPlan('2',this)">2 pers.<b>150€</b></div>
+        <div class="aplan-opt" data-plan="2" onclick="choisirPlan('2',this)">2 pers.<b>125€</b></div>
         <div class="aplan-opt" data-plan="5" onclick="choisirPlan('5',this)">5 pers.<b>210€</b></div>
       </div>
       <button class="btn btn-lime btn-block" onclick="creerEspace()">Créer mon espace</button>
@@ -295,10 +303,14 @@ tr:hover td{background:var(--surface2);}
   <div class="tl-box">
     <h2>Votre essai gratuit est terminé</h2>
     <p>Vous avez profité de 7 jours d'essai gratuit. Pour continuer à utiliser Global Business Smart, choisissez une formule ci-dessous.</p>
+    <div style="display:flex;gap:8px;justify-content:center;margin-bottom:18px">
+      <button class="btn btn-sm periode-btn btn-lime" data-groupe="lock" data-periode="mensuel" onclick="setPeriodePaiement('mensuel','lock')">Mensuel</button>
+      <button class="btn btn-sm periode-btn btn-ghost" data-groupe="lock" data-periode="annuel" onclick="setPeriodePaiement('annuel','lock')">Annuel (2 mois offerts)</button>
+    </div>
     <div class="tl-links">
-      <a class="btn btn-lime btn-block" id="tl-link-1" target="_blank">S'abonner — Solo 75€/mois</a>
-      <a class="btn btn-ghost btn-block" id="tl-link-2" target="_blank">S'abonner — Équipe 150€/mois</a>
-      <a class="btn btn-ghost btn-block" id="tl-link-5" target="_blank">S'abonner — Business 210€/mois</a>
+      <a class="btn btn-lime btn-block" id="tl-link-1" target="_blank">Payer — Solo 75€/mois</a>
+      <a class="btn btn-ghost btn-block" id="tl-link-2" target="_blank">Payer — Équipe 125€/mois</a>
+      <a class="btn btn-ghost btn-block" id="tl-link-5" target="_blank">Payer — Business 210€/mois</a>
       <button class="btn btn-ghost btn-block" onclick="quitterEspace()">Quitter</button>
     </div>
   </div>
@@ -336,6 +348,7 @@ tr:hover td{background:var(--surface2);}
     </div>
     <div class="sb-bottom">
       <div id="sb-email" style="color:var(--text2);margin-bottom:10px;word-break:break-all"></div>
+      <button class="btn btn-ghost btn-sm btn-block" style="margin-bottom:8px" onclick="partagerApp()">Partager l'application</button>
       <button class="btn btn-ghost btn-sm btn-block" onclick="quitterEspace()">Quitter cet espace</button>
     </div>
   </nav>
@@ -589,9 +602,13 @@ tr:hover td{background:var(--surface2);}
           <div class="statrow" style="border-color:rgba(0,0,0,.15)"><span>Formule actuelle</span><strong id="pa-plan-actuel">—</strong></div>
           <div class="statrow" style="border-color:rgba(0,0,0,.15)"><span>Statut</span><span id="pa-statut-actuel">—</span></div>
           <div id="pa-jours-restants" style="font-size:14px;font-weight:700;margin-top:6px"></div>
-          <div style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap">
+          <div style="display:flex;gap:8px;margin-top:16px">
+            <button class="btn btn-sm periode-btn" data-groupe="abo" data-periode="mensuel" onclick="setPeriodePaiement('mensuel','abo')">Mensuel</button>
+            <button class="btn btn-sm periode-btn" data-groupe="abo" data-periode="annuel" onclick="setPeriodePaiement('annuel','abo')">Annuel (2 mois offerts)</button>
+          </div>
+          <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
             <a class="btn" style="background:#12140a;color:#fff" id="stripe-link-1" target="_blank">Payer — Solo 75€</a>
-            <a class="btn" style="background:#12140a;color:#fff" id="stripe-link-2" target="_blank">Payer — Équipe 150€</a>
+            <a class="btn" style="background:#12140a;color:#fff" id="stripe-link-2" target="_blank">Payer — Équipe 125€</a>
             <a class="btn" style="background:#12140a;color:#fff" id="stripe-link-5" target="_blank">Payer — Business 210€</a>
           </div>
           <div style="font-size:12.5px;margin-top:14px;opacity:.75">Après paiement, votre statut sera activé sous 24h.</div>
@@ -761,25 +778,77 @@ tr:hover td{background:var(--surface2);}
 var SUPABASE_URL = 'https://otpnegpmvsmutyhhmkvp.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_TrwWbJEwRijrmgEcNtzOqw_aosdIv_E';
 var ADMIN_PASSWORD = 'MissAdmin2026'; // change ce mot de passe si tu veux
-var STRIPE_LINK_1 = '#';
-var STRIPE_LINK_2 = '#';
-var STRIPE_LINK_5 = '#';
+var STRIPE_LINKS = {
+  '1': { mensuel:'https://buy.stripe.com/3cIcN53A3aJr2FheAcaEE04', annuel:'https://buy.stripe.com/9B63cv3A3cRz3Jl4ZCaEE05' },
+  '2': { mensuel:'https://buy.stripe.com/4gM4gz9Yr04N2Fh3VyaEE06', annuel:'https://buy.stripe.com/6oU3cvgmP9Fn4Npbo0aEE07' },
+  '5': { mensuel:'https://buy.stripe.com/28E8wP6Mf5p7fs33VyaEE08', annuel:'https://buy.stripe.com/fZu6oHfiLeZHgw763GaEE09' }
+};
+var PRIX_AFFICHE = {
+  '1': { mensuel:'75€/mois', annuel:'750€/an' },
+  '2': { mensuel:'125€/mois', annuel:'1 250€/an' },
+  '5': { mensuel:'210€/mois', annuel:'2 100€/an' }
+};
+var periodePaiement = 'mensuel';
 /* ============================================ */
 
 var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-var PLAN_NOMS = {'1':'Solo — 1 pers. (75€)','2':'Équipe — 2 pers. (150€)','5':'Business — 5 pers. (210€)'};
+var PLAN_NOMS = {'1':'Solo — 1 pers. (75€)','2':'Équipe — 2 pers. (125€)','5':'Business — 5 pers. (210€)'};
 var STATUT_PILLS = {actif:'<span class="pill pill-actif">Actif</span>',essai:'<span class="pill pill-essai">Essai</span>',impaye:'<span class="pill pill-impaye">Impayé</span>',annule:'<span class="pill pill-annule">Annulé</span>'};
 var planChoisi = '1';
 var currentCompany = null;
 var modeDemo = false;
 var modeAdmin = false;
 
-document.getElementById('stripe-link-1').href = STRIPE_LINK_1;
-document.getElementById('stripe-link-2').href = STRIPE_LINK_2;
-document.getElementById('stripe-link-5').href = STRIPE_LINK_5;
-document.getElementById('tl-link-1').href = STRIPE_LINK_1;
-document.getElementById('tl-link-2').href = STRIPE_LINK_2;
-document.getElementById('tl-link-5').href = STRIPE_LINK_5;
+document.getElementById('stripe-link-1').href = STRIPE_LINKS['1'].mensuel;
+document.getElementById('stripe-link-2').href = STRIPE_LINKS['2'].mensuel;
+document.getElementById('stripe-link-5').href = STRIPE_LINKS['5'].mensuel;
+document.getElementById('tl-link-1').href = STRIPE_LINKS['1'].mensuel;
+document.getElementById('tl-link-2').href = STRIPE_LINKS['2'].mensuel;
+document.getElementById('tl-link-5').href = STRIPE_LINKS['5'].mensuel;
+document.addEventListener('DOMContentLoaded', function(){
+  setPeriodePaiement('mensuel','abo');
+  setPeriodePaiement('mensuel','lock');
+});
+
+function setPeriodePaiement(periode, groupe){
+  periodePaiement = periode;
+  ['1','2','5'].forEach(function(p){
+    var lien = STRIPE_LINKS[p][periode];
+    var prix = PRIX_AFFICHE[p][periode];
+    var idSuffix = p;
+    var elA = document.getElementById((groupe==='abo'?'stripe-link-':'tl-link-')+idSuffix);
+    if(elA){ elA.href = lien; elA.textContent = 'Payer — '+({'1':'Solo','2':'Équipe','5':'Business'}[p])+' '+prix; }
+  });
+  document.querySelectorAll('.periode-btn[data-groupe="'+groupe+'"]').forEach(function(b){
+    var actif = b.dataset.periode===periode;
+    if(groupe==='abo'){
+      b.style.background = actif ? '#12140a' : 'transparent';
+      b.style.color = actif ? '#fff' : '#12140a';
+      b.style.border = actif ? '1px solid #12140a' : '1px solid #12140a';
+    } else {
+      b.classList.toggle('btn-lime', actif);
+      b.classList.toggle('btn-ghost', !actif);
+    }
+  });
+}
+
+/* ===== PARTAGE & AIDE INSTALLATION ===== */
+function toggleInstallHelp(){
+  var el = document.getElementById('install-help');
+  el.style.display = el.style.display==='none' ? 'block' : 'none';
+}
+async function partagerApp(){
+  var url = window.location.href.split('#')[0].split('?')[0];
+  var data = { title:'Global Business Smart', text:'Gérez votre entreprise en ligne avec Global Business Smart — essai gratuit de 7 jours.', url:url };
+  if(navigator.share){
+    try{ await navigator.share(data); } catch(e){ /* annulé par l'utilisateur */ }
+  } else if(navigator.clipboard){
+    await navigator.clipboard.writeText(url);
+    alert('Lien copié : '+url);
+  } else {
+    prompt('Copiez ce lien pour le partager :', url);
+  }
+}
 
 /* ===== MODALE ACCÈS ===== */
 function ouvrirAcces(plan){
