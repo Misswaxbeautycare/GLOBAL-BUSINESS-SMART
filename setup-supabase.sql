@@ -73,16 +73,19 @@ create table if not exists gbs_depenses (
   company_id text references gbs_companies(id) on delete cascade,
   date date,
   categorie text,
+  categorie_perso text,
   description text,
   montant numeric,
   created_at timestamptz default now()
 );
+alter table gbs_depenses add column if not exists categorie_perso text;
 
 -- 5) Employés
 create table if not exists gbs_employes (
   id text primary key,
   company_id text references gbs_companies(id) on delete cascade,
   nom text,
+  categorie text,
   poste text,
   telephone text,
   salaire numeric default 0,
@@ -91,6 +94,7 @@ create table if not exists gbs_employes (
   contrat text,
   created_at timestamptz default now()
 );
+alter table gbs_employes add column if not exists categorie text;
 
 -- 6) Présences
 create table if not exists gbs_presences (

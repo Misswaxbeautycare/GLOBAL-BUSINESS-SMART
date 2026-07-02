@@ -308,8 +308,8 @@ tr:hover td{background:var(--surface2);}
 <div id="view-app">
   <div id="sb-overlay" onclick="fermerMenuMobile()"></div>
   <div id="mobile-bar">
-    <div class="logo" style="font-size:15px">GLOBAL <span>BUSINESS</span> SMART</div>
     <button id="mobile-menu-btn" onclick="ouvrirMenuMobile()">☰</button>
+    <div class="logo" style="font-size:15px">GLOBAL <span>BUSINESS</span> SMART</div>
   </div>
   <nav class="sb" id="sidebar">
     <div class="sb-top">
@@ -323,6 +323,7 @@ tr:hover td{background:var(--surface2);}
       <div class="sn-item" onclick="allerPage('catalogue',this)">Catalogue</div>
       <div class="sn-item" onclick="allerPage('stocks',this)">Stocks</div>
       <div class="sn-item" onclick="allerPage('clients',this)">Clients</div>
+      <div class="sn-item" onclick="allerPage('whatsapp',this)">WhatsApp</div>
       <div class="sn-item" onclick="allerPage('mobilemoney',this)">Mobile Money</div>
       <div class="sn-item" onclick="allerPage('carte',this)">Carte Bancaire</div>
       <div class="sn-item" onclick="allerPage('comptabilite',this)">Comptabilité</div>
@@ -397,7 +398,12 @@ tr:hover td{background:var(--surface2);}
     <div class="pv" id="pg-stocks">
       <h2>Stocks</h2>
       <div class="sub">Suivi des quantités disponibles</div>
-      <div class="mvsub"><button class="btn btn-lime btn-sm" onclick="ouvrirM('m-produit')">+ Ajouter un stock</button></div>
+      <div class="mvsub">
+        <button class="btn btn-lime btn-sm" onclick="ouvrirM('m-produit')">+ Ajouter un stock</button>
+        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('stock-csv-input').click()">Importer un stock (CSV)</button>
+        <input type="file" id="stock-csv-input" accept=".csv" style="display:none" onchange="importerStockCSV(event)">
+      </div>
+      <div class="sub" style="margin-top:-10px;margin-bottom:16px;font-size:12.5px">Colonnes attendues : nom, prix, prix_achat, unite, stock, stock_min, categorie</div>
       <div class="card"><div id="stocks-liste"></div></div>
     </div>
 
@@ -407,6 +413,32 @@ tr:hover td{background:var(--surface2);}
       <div class="sub" id="client-count-titre">0 client(s) enregistré(s)</div>
       <div class="mvsub"><button class="btn btn-lime btn-sm" onclick="ouvrirM('m-client')">+ Nouveau client</button></div>
       <div class="card"><div id="client-liste"></div></div>
+    </div>
+
+    <!-- WHATSAPP -->
+    <div class="pv" id="pg-whatsapp">
+      <h2>WhatsApp</h2>
+      <div class="sub">Contactez un client déjà enregistré, ou un nouveau numéro</div>
+      <div class="card">
+        <h3>Client déjà enregistré</h3>
+        <div class="fgg">
+          <div class="fg full"><label>Choisir un client</label><select id="wa-client-sel" onchange="remplirWAClient()"><option value="">-- Sélectionner --</option></select></div>
+        </div>
+        <div class="actrow" style="margin-top:14px">
+          <button class="btn" style="background:#25d366;color:#fff" onclick="waEnvoyerMessage()">Envoyer un message WhatsApp</button>
+          <button class="btn btn-lime" onclick="waEnvoyerFacture()">Envoyer une facture</button>
+          <button class="btn btn-ghost" onclick="waEnvoyerEmail()">Envoyer un email</button>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Nouveau numéro</h3>
+        <div class="fgg">
+          <div class="fg"><label>Numéro WhatsApp</label><input type="tel" id="wa-num-manuel" placeholder="+32 495 63 99 02"></div>
+          <div class="fg"><label>Nom (optionnel)</label><input type="text" id="wa-nom-manuel" placeholder="Nom du contact"></div>
+          <div class="fg full"><label>Message</label><textarea id="wa-msg-manuel" rows="3" placeholder="Votre message..."></textarea></div>
+        </div>
+        <button class="btn" style="background:#25d366;color:#fff;margin-top:10px" onclick="waEnvoyerManuel()">Ouvrir WhatsApp</button>
+      </div>
     </div>
 
     <!-- MOBILE MONEY -->
@@ -585,7 +617,7 @@ tr:hover td{background:var(--surface2);}
   <div class="mh"><div class="mti">Nouvelle vente</div><button class="bx" onclick="fermerM('m-vente')">×</button></div>
   <div class="mb"><div class="fgg">
     <div class="fg"><label>Date</label><input type="date" id="v-date"></div>
-    <div class="fg"><label>Catégorie (optionnel)</label><select id="v-categorie"><option value="">-- Aucune --</option></select></div>
+    <div class="fg"><label>Catégorie (optionnel)</label><div style="display:flex;gap:6px"><select id="v-categorie" style="flex:1"><option value="">-- Aucune --</option></select><button type="button" class="btn btn-ghost btn-sm" onclick="ouvrirM('m-categorie')">+</button></div></div>
     <div class="fg full"><label>Article / Service</label><select id="v-produit" onchange="remplirPrix()"><option value="">-- Choisir dans le catalogue --</option></select></div>
     <div class="fg full"><label>Ou saisir manuellement</label><input type="text" id="v-prod-manuel" placeholder="Nom de l'article si absent du catalogue"></div>
     <div class="fg"><label>Quantité</label><input type="number" id="v-qte" value="1" min="1" oninput="calcTotal()"></div>
@@ -605,7 +637,7 @@ tr:hover td{background:var(--surface2);}
     <div class="fg"><label>N° Facture</label><input id="f-num" readonly style="opacity:.6"></div>
     <div class="fg"><label>Date</label><input type="date" id="f-date"></div>
     <div class="fg full"><label>Client</label><input id="f-client" type="text" placeholder="Nom du client" list="clients-list" oninput="remplirContactFacture()"></div>
-    <div class="fg"><label>Catégorie (optionnel)</label><select id="f-categorie"><option value="">-- Aucune --</option></select></div>
+    <div class="fg"><label>Catégorie (optionnel)</label><div style="display:flex;gap:6px"><select id="f-categorie" style="flex:1"><option value="">-- Aucune --</option></select><button type="button" class="btn btn-ghost btn-sm" onclick="ouvrirM('m-categorie')">+</button></div></div>
     <div class="fg"><label>Article / Service</label><input id="f-prod" type="text" placeholder="Description"></div>
     <div class="fg"><label>Quantité</label><input id="f-qte" type="text" placeholder="Ex: 3 pièces"></div>
     <div class="fg"><label>Prix total (€)</label><input id="f-tot" type="number" placeholder="0"></div>
@@ -650,7 +682,7 @@ tr:hover td{background:var(--surface2);}
   <div class="mh"><div class="mti" id="produit-titre-modal">Ajouter un article/service</div><button class="bx" onclick="fermerM('m-produit')">×</button></div>
   <div class="mb"><div class="fgg">
     <input type="hidden" id="p-id">
-    <div class="fg full"><label>Catégorie (optionnel)</label><select id="p-categorie"><option value="">-- Aucune --</option></select></div>
+    <div class="fg full"><label>Catégorie (optionnel)</label><div style="display:flex;gap:6px"><select id="p-categorie" style="flex:1"><option value="">-- Aucune --</option></select><button type="button" class="btn btn-ghost btn-sm" onclick="ouvrirM('m-categorie')">+</button></div></div>
     <div class="fg full"><label>Nom de l'article / service</label><input type="text" id="p-nom" placeholder="Ex: Prestation, Produit..."></div>
     <div class="fg"><label>Prix d'achat (€)</label><input type="number" id="p-prix-achat" placeholder="0" oninput="calcMargeProduit()"></div>
     <div class="fg"><label>Prix de vente (€)</label><input type="number" id="p-prix" placeholder="0" oninput="calcMargeProduit()"></div>
@@ -667,7 +699,8 @@ tr:hover td{background:var(--surface2);}
   <div class="mh"><div class="mti">Ajouter une dépense</div><button class="bx" onclick="fermerM('m-depense')">×</button></div>
   <div class="mb"><div class="fgg">
     <div class="fg"><label>Date</label><input type="date" id="d-date"></div>
-    <div class="fg"><label>Catégorie</label><select id="d-categorie"><option>Achat stock</option><option>Salaires</option><option>Transport</option><option>Loyer</option><option>Outils / Logiciels</option><option>Marketing</option><option>Autre</option></select></div>
+    <div class="fg"><label>Type de dépense</label><select id="d-categorie"><option>Achat stock</option><option>Salaires</option><option>Transport</option><option>Loyer</option><option>Outils / Logiciels</option><option>Marketing</option><option>Autre</option></select></div>
+    <div class="fg"><label>Catégorie personnalisée (optionnel)</label><div style="display:flex;gap:6px"><select id="d-categorie-perso" style="flex:1"><option value="">-- Aucune --</option></select><button type="button" class="btn btn-ghost btn-sm" onclick="ouvrirM('m-categorie')">+</button></div></div>
     <div class="fg full"><label>Description</label><input type="text" id="d-desc" placeholder="Détail de la dépense"></div>
     <div class="fg full"><label>Montant (€)</label><input type="number" id="d-montant" placeholder="0"></div>
   </div></div>
@@ -679,6 +712,7 @@ tr:hover td{background:var(--surface2);}
   <div class="mb"><div class="fgg">
     <input type="hidden" id="e-id">
     <div class="fg full"><label>Nom complet</label><input type="text" id="e-nom" placeholder="Prénom Nom"></div>
+    <div class="fg"><label>Catégorie (optionnel)</label><div style="display:flex;gap:6px"><select id="e-categorie" style="flex:1"><option value="">-- Aucune --</option></select><button type="button" class="btn btn-ghost btn-sm" onclick="ouvrirM('m-categorie')">+</button></div></div>
     <div class="fg"><label>Poste / Fonction</label><input type="text" id="e-poste" placeholder="Ex: Vendeur, Comptable"></div>
     <div class="fg"><label>Téléphone / WhatsApp</label><input type="text" id="e-tel" placeholder="+32..."></div>
     <div class="fg"><label>Salaire de base (€/mois)</label><input type="number" id="e-salaire" placeholder="0"></div>
@@ -911,7 +945,7 @@ var TABLE_MAP = {
 var FIELD_MAP = {
   produits:{prixAchat:'prix_achat', stockMin:'stock_min', companyId:'company_id'},
   ventes:{clientNum:'client_num', companyId:'company_id'},
-  depenses:{desc:'description', companyId:'company_id'},
+  depenses:{desc:'description', categoriePerso:'categorie_perso', companyId:'company_id'},
   employes:{tel:'telephone', modeSal:'mode_salaire', date:'date_embauche', companyId:'company_id'},
   presences:{empId:'emp_id', companyId:'company_id'},
   clients:{tel:'telephone', totalAchete:'total_achete', nbAchats:'nb_achats', companyId:'company_id'},
@@ -1003,10 +1037,10 @@ function initModal(id){
   }
   if(id==='m-mm'){ document.getElementById('mm-date').value = today; }
   if(id==='m-carte'){ document.getElementById('ca-date').value = today; }
-  if(id==='m-depense'){ document.getElementById('d-date').value = today; }
+  if(id==='m-depense'){ document.getElementById('d-date').value = today; document.getElementById('d-categorie-perso').value=''; }
   if(id==='m-emp'){
     document.getElementById('e-id').value=''; document.getElementById('e-nom').value='';
-    document.getElementById('e-poste').value=''; document.getElementById('e-tel').value='';
+    document.getElementById('e-categorie').value=''; document.getElementById('e-poste').value=''; document.getElementById('e-tel').value='';
     document.getElementById('e-salaire').value=''; document.getElementById('e-date').value=today;
     document.getElementById('emp-titre-modal').textContent='Nouvel employé';
   }
@@ -1232,6 +1266,36 @@ function editerProduit(id){
   document.getElementById('produit-titre-modal').textContent='Modifier l\'article';
 }
 function supprimerProduit(id){ if(!confirm('Supprimer cet article ?')) return; CACHE.produits=CACHE.produits.filter(function(p){return p.id!==id;}); sbDelete('produits',id); afficherCatalogue(); afficherStocks(); afficherBord(); }
+function importerStockCSV(event){
+  var file = event.target.files[0]; if(!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e){
+    var lignes = e.target.result.split(/\r?\n/).filter(function(l){ return l.trim(); });
+    if(!lignes.length){ alert('Fichier vide.'); return; }
+    var header = lignes[0].split(',').map(function(h){ return h.trim().toLowerCase(); });
+    var idx = { nom:header.indexOf('nom'), prix:header.indexOf('prix'), prixAchat:header.indexOf('prix_achat'),
+      unite:header.indexOf('unite'), stock:header.indexOf('stock'), stockMin:header.indexOf('stock_min'), categorie:header.indexOf('categorie') };
+    if(idx.nom<0){ alert('La colonne "nom" est obligatoire dans le CSV.'); return; }
+    var ajoutes=0;
+    for(var i=1;i<lignes.length;i++){
+      var cols = lignes[i].split(',');
+      var nom = (cols[idx.nom]||'').trim(); if(!nom) continue;
+      var p = {id:DB.id(), nom:nom,
+        prix: idx.prix>=0 ? (parseFloat(cols[idx.prix])||0) : 0,
+        prixAchat: idx.prixAchat>=0 ? (parseFloat(cols[idx.prixAchat])||0) : 0,
+        unite: idx.unite>=0 ? (cols[idx.unite]||'pièce').trim() : 'pièce',
+        stock: idx.stock>=0 ? (parseFloat(cols[idx.stock])||0) : 0,
+        stockMin: idx.stockMin>=0 ? (parseFloat(cols[idx.stockMin])||0) : 0,
+        categorie: idx.categorie>=0 ? (cols[idx.categorie]||'').trim() : '',
+        notes:''};
+      CACHE.produits.unshift(p); sbInsert('produits', p); ajoutes++;
+    }
+    alert(ajoutes+' article(s) importé(s) automatiquement.');
+    afficherCatalogue(); afficherStocks(); afficherBord();
+    event.target.value='';
+  };
+  reader.readAsText(file);
+}
 function afficherCatalogue(){
   var prods = DB.get('produits');
   if(filtreCatCatalogue) prods = prods.filter(function(p){ return p.categorie===filtreCatCatalogue; });
@@ -1250,6 +1314,7 @@ function afficherStocks(){
 /* ===== DEPENSES ===== */
 function ajouterDepense(){
   var d={id:DB.id(), date:document.getElementById('d-date').value, categorie:document.getElementById('d-categorie').value,
+    categoriePerso:document.getElementById('d-categorie-perso').value,
     desc:document.getElementById('d-desc').value, montant:parseFloat(document.getElementById('d-montant').value)||0};
   if(!d.montant){ alert('Montant requis.'); return; }
   CACHE.depenses.unshift(d); sbInsert('depenses', d); fermerM('m-depense'); afficherDepenses(); afficherBord();
@@ -1268,7 +1333,7 @@ function suppDep(id){ if(!confirm('Supprimer ?')) return; CACHE.depenses=CACHE.d
 function sauverEmploye(){
   var id=document.getElementById('e-id').value, nom=document.getElementById('e-nom').value.trim();
   if(!nom){ alert('Nom requis.'); return; }
-  var e={id:id||DB.id(), nom:nom, poste:document.getElementById('e-poste').value, tel:document.getElementById('e-tel').value,
+  var e={id:id||DB.id(), nom:nom, categorie:document.getElementById('e-categorie').value, poste:document.getElementById('e-poste').value, tel:document.getElementById('e-tel').value,
     salaire:parseFloat(document.getElementById('e-salaire').value)||0, modeSal:document.getElementById('e-mode-sal').value,
     date:document.getElementById('e-date').value, contrat:document.getElementById('e-contrat').value};
   if(id){ CACHE.employes=CACHE.employes.map(function(x){return x.id===id?e:x;}); sbUpdate('employes',e); }
@@ -1279,7 +1344,7 @@ function editerEmploye(id){
   var e=DB.get('employes').find(function(x){return x.id===id;}); if(!e) return;
   ouvrirM('m-emp');
   document.getElementById('e-id').value=e.id; document.getElementById('e-nom').value=e.nom;
-  document.getElementById('e-poste').value=e.poste; document.getElementById('e-tel').value=e.tel;
+  document.getElementById('e-categorie').value=e.categorie||''; document.getElementById('e-poste').value=e.poste; document.getElementById('e-tel').value=e.tel;
   document.getElementById('e-salaire').value=e.salaire; document.getElementById('e-mode-sal').value=e.modeSal;
   document.getElementById('e-date').value=e.date; document.getElementById('e-contrat').value=e.contrat;
   document.getElementById('emp-titre-modal').textContent='Modifier l\'employé';
@@ -1431,6 +1496,37 @@ function afficherBord(){
     recent.map(function(v){ return '<tr><td>'+fmtDate(v.date)+'</td><td>'+v.produit+'</td><td>'+v.client+'</td><td><strong>'+fmt(v.total)+'</strong></td><td>'+(STATUTS_V[v.statut]||v.statut)+'</td></tr>'; }).join('')+'</tbody></table>'; }
 }
 
+/* ===== WHATSAPP (onglet dédié) ===== */
+function afficherWhatsapp(){
+  var sel = document.getElementById('wa-client-sel');
+  sel.innerHTML = '<option value="">-- Sélectionner --</option>' + DB.get('clients').map(function(c){ return '<option value="'+c.id+'">'+c.nom+' ('+(c.tel||'sans tél.')+')</option>'; }).join('');
+}
+function remplirWAClient(){}
+function getClientWASelectionne(){
+  var id = document.getElementById('wa-client-sel').value;
+  if(!id){ alert('Choisissez un client d\'abord.'); return null; }
+  return DB.get('clients').find(function(c){ return c.id===id; });
+}
+function waEnvoyerMessage(){
+  var c = getClientWASelectionne(); if(!c) return;
+  if(!c.tel){ alert('Ce client n\'a pas de numéro enregistré.'); return; }
+  envWA(c.nom, 0, 'MSG', c.tel);
+}
+function waEnvoyerFacture(){
+  var c = getClientWASelectionne(); if(!c) return;
+  ouvrirFactureClient(c.id);
+}
+function waEnvoyerEmail(){
+  var c = getClientWASelectionne(); if(!c) return;
+  contacterClientEmail(c.id);
+}
+function waEnvoyerManuel(){
+  var num = document.getElementById('wa-num-manuel').value.replace(/[\s\+\-]/g,'');
+  var msg = document.getElementById('wa-msg-manuel').value || ('Bonjour, ici '+(currentCompany.nom_societe||'')+'.');
+  if(!num){ alert('Entrez un numéro WhatsApp.'); return; }
+  window.open('https://wa.me/'+num+'?text='+encodeURIComponent(msg),'_blank');
+}
+
 /* ===== RAFRAICHISSEMENT ===== */
 function rafraichir(page){
   if(page==='dashboard') afficherBord();
@@ -1446,6 +1542,7 @@ function rafraichir(page){
   else if(page==='clients') afficherClients();
   else if(page==='mobilemoney') afficherMM();
   else if(page==='carte') afficherCarte();
+  else if(page==='whatsapp') afficherWhatsapp();
 }
 
 /* ===== CATÉGORIES ===== */
@@ -1453,6 +1550,7 @@ var filtreCatVentes = '';
 var filtreCatCatalogue = '';
 function peupleTousLesSelectsCategorie(){
   peupleSelect('v-categorie'); peupleSelect('f-categorie'); peupleSelect('p-categorie');
+  peupleSelect('d-categorie-perso'); peupleSelect('e-categorie');
   peuplePills('pills-ventes', filtreCatVentes, function(v){ filtreCatVentes=v; afficherVentes(); });
   peuplePills('pills-cat', filtreCatCatalogue, function(v){ filtreCatCatalogue=v; afficherCatalogue(); });
   afficherCategoriesModal();
