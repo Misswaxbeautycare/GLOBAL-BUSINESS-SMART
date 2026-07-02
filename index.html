@@ -313,7 +313,8 @@ tr:hover td{background:var(--surface2);}
   </div>
   <nav class="sb" id="sidebar">
     <div class="sb-top">
-      <div class="logo" style="font-size:16px">GLOBAL <span>BUSINESS</span> SMART</div>
+      <div class="logo" style="font-size:16px" id="sb-logo-text">GLOBAL <span>BUSINESS</span> SMART</div>
+      <div id="sb-trial-badge" style="display:none;margin-top:12px;background:var(--lime);color:#12140a;border-radius:10px;padding:9px 12px;font-size:12.5px;font-weight:800;cursor:pointer;text-align:center" onclick="ouvrirAbonnement()"></div>
     </div>
     <div class="sb-nav">
       <div class="sn-item on" onclick="allerPage('dashboard',this)">Tableau de bord</div>
@@ -369,6 +370,7 @@ tr:hover td{background:var(--surface2);}
         <button class="btn btn-ghost btn-sm" onclick="exporterVentes()">Exporter CSV</button>
         <button class="btn btn-lime btn-sm" onclick="ouvrirM('m-vente')">+ Nouvelle vente</button>
       </div>
+      <div class="pills" id="pills-ventes" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px"></div>
       <div class="calc-box"><div><div class="calc-lbl">Total (payé)</div><div class="calc-val" id="ventes-total">0 €</div></div><div style="text-align:right"><div class="calc-lbl">Nombre de ventes</div><div class="calc-val" id="ventes-count">0</div></div></div>
       <div class="card" style="margin-top:16px"><div id="ventes-tbody"></div></div>
     </div>
@@ -386,7 +388,8 @@ tr:hover td{background:var(--surface2);}
     <div class="pv" id="pg-catalogue">
       <h2>Catalogue</h2>
       <div class="sub">Vos articles et services</div>
-      <div class="mvsub"><button class="btn btn-lime btn-sm" onclick="ouvrirM('m-produit')">+ Ajouter un article</button></div>
+      <div class="mvsub"><button class="btn btn-lime btn-sm" onclick="ouvrirM('m-produit')">+ Ajouter un article</button><button class="btn btn-ghost btn-sm" onclick="ouvrirM('m-categorie')">Gérer les catégories</button></div>
+      <div class="pills" id="pills-cat" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px"></div>
       <div class="card"><div id="cat-liste"></div></div>
     </div>
 
@@ -394,6 +397,7 @@ tr:hover td{background:var(--surface2);}
     <div class="pv" id="pg-stocks">
       <h2>Stocks</h2>
       <div class="sub">Suivi des quantités disponibles</div>
+      <div class="mvsub"><button class="btn btn-lime btn-sm" onclick="ouvrirM('m-produit')">+ Ajouter un stock</button></div>
       <div class="card"><div id="stocks-liste"></div></div>
     </div>
 
@@ -436,6 +440,16 @@ tr:hover td{background:var(--surface2);}
         <div class="kpi"><div class="kl">Dépenses</div><div class="kv" id="c-dep">0 €</div></div>
         <div class="kpi"><div class="kl">Bénéfice net</div><div class="kv" id="c-ben">0 €</div></div>
         <div class="kpi"><div class="kl">Marge</div><div class="kv" id="c-marge">—</div></div>
+      </div>
+      <div class="card">
+        <h3>Comptabilité globale — depuis le début</h3>
+        <div class="sub" style="margin-bottom:0">Calculée automatiquement, indépendamment du filtre de période ci-dessus.</div>
+        <div class="kpis4" style="margin-top:16px">
+          <div class="kpi"><div class="kl">Recettes totales</div><div class="kv" id="cg-rec">0 €</div></div>
+          <div class="kpi"><div class="kl">Dépenses totales</div><div class="kv" id="cg-dep">0 €</div></div>
+          <div class="kpi"><div class="kl">Bénéfice total</div><div class="kv" id="cg-ben">0 €</div></div>
+          <div class="kpi"><div class="kl">Marge globale</div><div class="kv" id="cg-marge">—</div></div>
+        </div>
       </div>
     </div>
 
@@ -493,23 +507,63 @@ tr:hover td{background:var(--surface2);}
 
     <div class="pv" id="pg-parametres">
       <h2>Paramètres</h2>
-      <div class="sub">Gérez votre espace et votre abonnement</div>
-      <div class="card">
-        <h3>Informations de la société</h3>
-        <div class="afield"><label>Nom de la société</label><input type="text" id="pa-societe"></div>
-        <div class="afield"><label>Email de la société</label><input type="email" id="pa-email" disabled style="opacity:.6"></div>
-        <button class="btn btn-lime btn-sm" onclick="sauverParametres()">Enregistrer</button>
+      <div class="sub">Gérez votre espace, votre apparence et votre abonnement</div>
+      <div class="mvsub">
+        <button class="btn btn-lime btn-sm" id="ptab-general" onclick="setParamOnglet('general',this)">Général</button>
+        <button class="btn btn-ghost btn-sm" id="ptab-apparence" onclick="setParamOnglet('apparence',this)">Apparence</button>
+        <button class="btn btn-ghost btn-sm" id="ptab-profil" onclick="setParamOnglet('profil',this)">Profil</button>
+        <button class="btn btn-ghost btn-sm" id="ptab-abonnement" onclick="setParamOnglet('abonnement',this)">Abonnement</button>
       </div>
-      <div class="card">
-        <h3>Abonnement</h3>
-        <div class="statrow"><span>Formule actuelle</span><strong id="pa-plan-actuel">—</strong></div>
-        <div class="statrow"><span>Statut</span><span id="pa-statut-actuel">—</span></div>
-        <div style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap">
-          <a class="btn btn-ghost btn-sm" id="stripe-link-1" target="_blank">Payer — Solo 75€</a>
-          <a class="btn btn-ghost btn-sm" id="stripe-link-2" target="_blank">Payer — Équipe 150€</a>
-          <a class="btn btn-ghost btn-sm" id="stripe-link-5" target="_blank">Payer — Business 210€</a>
+
+      <div class="param-onglet" id="po-general">
+        <div class="card">
+          <h3>Informations de la société</h3>
+          <div class="afield"><label>Nom de la société</label><input type="text" id="pa-societe"></div>
+          <div class="afield"><label>Email de la société</label><input type="email" id="pa-email" disabled style="opacity:.6"></div>
+          <button class="btn btn-lime btn-sm" onclick="sauverParametres()">Enregistrer</button>
         </div>
-        <div style="font-size:12.5px;color:var(--text3);margin-top:14px">Après paiement, votre statut sera activé sous 24h.</div>
+      </div>
+
+      <div class="param-onglet" id="po-apparence" style="display:none">
+        <div class="card">
+          <h3>Couleur de l'application</h3>
+          <div class="sub" style="margin-bottom:14px">Choisissez la couleur d'accent utilisée dans votre espace.</div>
+          <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+            <input type="color" id="pa-couleur" value="#a6bd49" style="width:60px;height:44px;border-radius:9px;border:1px solid var(--border2);background:var(--bg);cursor:pointer">
+            <button class="btn btn-lime btn-sm" onclick="sauverCouleur()">Appliquer et enregistrer</button>
+            <button class="btn btn-ghost btn-sm" onclick="reinitialiserCouleur()">Réinitialiser</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="param-onglet" id="po-profil" style="display:none">
+        <div class="card">
+          <h3>Photo de profil</h3>
+          <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap">
+            <img id="pa-photo-preview" src="" style="width:72px;height:72px;border-radius:50%;object-fit:cover;background:var(--surface2);border:1px solid var(--border2);display:none">
+            <div id="pa-photo-vide" style="width:72px;height:72px;border-radius:50%;background:var(--surface2);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:11px;text-align:center">Aucune photo</div>
+            <div>
+              <input type="file" id="pa-photo-input" accept="image/*" style="display:none" onchange="previewPhoto(event)">
+              <button class="btn btn-ghost btn-sm" onclick="document.getElementById('pa-photo-input').click()">Choisir une image</button>
+              <button class="btn btn-lime btn-sm" onclick="sauverPhoto()">Enregistrer</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="param-onglet" id="po-abonnement" style="display:none">
+        <div class="card" style="background:var(--lime);color:#12140a;border:none">
+          <h3 style="color:#12140a">Votre abonnement</h3>
+          <div class="statrow" style="border-color:rgba(0,0,0,.15)"><span>Formule actuelle</span><strong id="pa-plan-actuel">—</strong></div>
+          <div class="statrow" style="border-color:rgba(0,0,0,.15)"><span>Statut</span><span id="pa-statut-actuel">—</span></div>
+          <div id="pa-jours-restants" style="font-size:14px;font-weight:700;margin-top:6px"></div>
+          <div style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap">
+            <a class="btn" style="background:#12140a;color:#fff" id="stripe-link-1" target="_blank">Payer — Solo 75€</a>
+            <a class="btn" style="background:#12140a;color:#fff" id="stripe-link-2" target="_blank">Payer — Équipe 150€</a>
+            <a class="btn" style="background:#12140a;color:#fff" id="stripe-link-5" target="_blank">Payer — Business 210€</a>
+          </div>
+          <div style="font-size:12.5px;margin-top:14px;opacity:.75">Après paiement, votre statut sera activé sous 24h.</div>
+        </div>
       </div>
     </div>
 
@@ -531,7 +585,7 @@ tr:hover td{background:var(--surface2);}
   <div class="mh"><div class="mti">Nouvelle vente</div><button class="bx" onclick="fermerM('m-vente')">×</button></div>
   <div class="mb"><div class="fgg">
     <div class="fg"><label>Date</label><input type="date" id="v-date"></div>
-    <div class="fg"><label>Catégorie (optionnel)</label><input type="text" id="v-categorie" placeholder="Ex: Boutique, Service..."></div>
+    <div class="fg"><label>Catégorie (optionnel)</label><select id="v-categorie"><option value="">-- Aucune --</option></select></div>
     <div class="fg full"><label>Article / Service</label><select id="v-produit" onchange="remplirPrix()"><option value="">-- Choisir dans le catalogue --</option></select></div>
     <div class="fg full"><label>Ou saisir manuellement</label><input type="text" id="v-prod-manuel" placeholder="Nom de l'article si absent du catalogue"></div>
     <div class="fg"><label>Quantité</label><input type="number" id="v-qte" value="1" min="1" oninput="calcTotal()"></div>
@@ -551,7 +605,7 @@ tr:hover td{background:var(--surface2);}
     <div class="fg"><label>N° Facture</label><input id="f-num" readonly style="opacity:.6"></div>
     <div class="fg"><label>Date</label><input type="date" id="f-date"></div>
     <div class="fg full"><label>Client</label><input id="f-client" type="text" placeholder="Nom du client" list="clients-list" oninput="remplirContactFacture()"></div>
-    <div class="fg"><label>Catégorie (optionnel)</label><input id="f-categorie" type="text" placeholder="Ex: Boutique, Service..."></div>
+    <div class="fg"><label>Catégorie (optionnel)</label><select id="f-categorie"><option value="">-- Aucune --</option></select></div>
     <div class="fg"><label>Article / Service</label><input id="f-prod" type="text" placeholder="Description"></div>
     <div class="fg"><label>Quantité</label><input id="f-qte" type="text" placeholder="Ex: 3 pièces"></div>
     <div class="fg"><label>Prix total (€)</label><input id="f-tot" type="number" placeholder="0"></div>
@@ -596,7 +650,7 @@ tr:hover td{background:var(--surface2);}
   <div class="mh"><div class="mti" id="produit-titre-modal">Ajouter un article/service</div><button class="bx" onclick="fermerM('m-produit')">×</button></div>
   <div class="mb"><div class="fgg">
     <input type="hidden" id="p-id">
-    <div class="fg full"><label>Catégorie (optionnel)</label><input type="text" id="p-categorie" placeholder="Ex: Boutique, Service..."></div>
+    <div class="fg full"><label>Catégorie (optionnel)</label><select id="p-categorie"><option value="">-- Aucune --</option></select></div>
     <div class="fg full"><label>Nom de l'article / service</label><input type="text" id="p-nom" placeholder="Ex: Prestation, Produit..."></div>
     <div class="fg"><label>Prix d'achat (€)</label><input type="number" id="p-prix-achat" placeholder="0" oninput="calcMargeProduit()"></div>
     <div class="fg"><label>Prix de vente (€)</label><input type="number" id="p-prix" placeholder="0" oninput="calcMargeProduit()"></div>
@@ -646,6 +700,19 @@ tr:hover td{background:var(--surface2);}
     <div class="fg full"><label>Notes</label><textarea id="cl-notes" rows="2" placeholder="Notes sur ce client..."></textarea></div>
   </div></div>
   <div class="mf"><button class="btn btn-ghost" onclick="fermerM('m-client')">Annuler</button><button class="btn btn-lime" onclick="sauverClient()">Enregistrer</button></div>
+</div></div>
+
+<div class="ov" id="m-categorie"><div class="mo">
+  <div class="mh"><div class="mti">Gérer les catégories</div><button class="bx" onclick="fermerM('m-categorie')">×</button></div>
+  <div class="mb">
+    <div class="sub" style="margin-bottom:16px">Ex : Boutique, Restaurant, Logement, Service... Utilisées pour classer vos articles et vos ventes.</div>
+    <div style="display:flex;gap:8px;margin-bottom:18px">
+      <input type="text" id="cat-nouveau-nom" placeholder="Nom de la nouvelle catégorie" style="flex:1;padding:11px 12px;border-radius:9px;border:1px solid var(--border2);background:var(--bg);color:var(--text)">
+      <button class="btn btn-lime btn-sm" onclick="ajouterCategorie()">Ajouter</button>
+    </div>
+    <div id="categories-liste"></div>
+  </div>
+  <div class="mf"><button class="btn btn-ghost" onclick="fermerM('m-categorie')">Fermer</button></div>
 </div></div>
 
 <div class="ov" id="m-sal"><div class="mo">
@@ -795,11 +862,16 @@ function entrerDansEspace(company){
   document.getElementById('pa-plan-actuel').textContent = PLAN_NOMS[company.plan]||company.plan;
   document.getElementById('pa-statut-actuel').innerHTML = STATUT_PILLS[company.statut_abonnement]||company.statut_abonnement;
 
+  if(company.couleur){ document.getElementById('pa-couleur').value = company.couleur; appliquerCouleur(company.couleur); }
+  if(company.photo){ appliquerPhoto(company.photo); }
+  majBadgeEssai();
+
   document.getElementById('trial-lock').classList.remove('on');
   document.getElementById('dash-trial-banner').innerHTML='';
   if(modeDemo){
     document.getElementById('dash-trial-banner').innerHTML = '<div class="trial-banner">Mode démonstration — aucune donnée n\'est enregistrée.</div>';
     initDonneesDemo();
+    peupleTousLesSelectsCategorie();
     afficherBord();
   } else if(company.statut_abonnement === 'essai'){
     var reste = joursRestantsEssai(company.date_creation);
@@ -834,7 +906,7 @@ var TABLE_MAP = {
   produits:'gbs_produits', ventes:'gbs_ventes', depenses:'gbs_depenses',
   employes:'gbs_employes', presences:'gbs_presences', clients:'gbs_clients',
   factures:'gbs_factures', mm:'gbs_mobilemoney', carte:'gbs_carte',
-  paiementsSalaires:'gbs_paiements_salaires'
+  paiementsSalaires:'gbs_paiements_salaires', categories:'gbs_categories'
 };
 var FIELD_MAP = {
   produits:{prixAchat:'prix_achat', stockMin:'stock_min', companyId:'company_id'},
@@ -846,12 +918,13 @@ var FIELD_MAP = {
   factures:{date:'date_facture', companyId:'company_id'},
   mm:{num:'numero', companyId:'company_id'},
   carte:{companyId:'company_id'},
-  paiementsSalaires:{empId:'emp_id', date:'date_paiement', companyId:'company_id'}
+  paiementsSalaires:{empId:'emp_id', date:'date_paiement', companyId:'company_id'},
+  categories:{companyId:'company_id'}
 };
 function toRow(key, obj){ var map=FIELD_MAP[key]||{}; var row={}; for(var k in obj){ row[map[k]||k]=obj[k]; } return row; }
 function fromRow(key, row){ var map=FIELD_MAP[key]||{}; var inv={}; for(var k in map) inv[map[k]]=k; var obj={}; for(var k in row){ if(k==='created_at') continue; obj[inv[k]||k]=row[k]; } return obj; }
 
-var CACHE = {produits:[],ventes:[],depenses:[],employes:[],presences:[],clients:[],factures:[],mm:[],carte:[],paiementsSalaires:[]};
+var CACHE = {produits:[],ventes:[],depenses:[],employes:[],presences:[],clients:[],factures:[],mm:[],carte:[],paiementsSalaires:[],categories:[]};
 var DB = { get:function(k){ return CACHE[k]||[]; }, id:function(){ return 'x_'+Date.now().toString(36)+Math.random().toString(36).substr(2,6); } };
 
 async function sbInsert(key, obj){
@@ -880,14 +953,16 @@ async function chargerTable(key){
 async function chargerTout(){
   var keys = Object.keys(TABLE_MAP);
   for(var i=0;i<keys.length;i++){ await chargerTable(keys[i]); }
+  peupleTousLesSelectsCategorie();
   afficherBord();
   var pgOn = document.querySelector('.pv.on');
   if(pgOn) rafraichir(pgOn.id.replace('pg-',''));
 }
 
 function initDonneesDemo(){
-  CACHE.produits=[{id:'d1',nom:'Produit exemple',prix:25,prixAchat:15,unite:'pièce',stock:12,stockMin:5,notes:'',categorie:''}];
-  CACHE.ventes=[{id:'d2',date:new Date().toISOString().split('T')[0],categorie:'',produit:'Produit exemple',qte:2,prix:25,total:50,client:'Client Démo',clientNum:'+32000000',mode:'cash',statut:'paye'}];
+  CACHE.categories=[{id:'c1',nom:'Boutique'},{id:'c2',nom:'Service'}];
+  CACHE.produits=[{id:'d1',nom:'Produit exemple',prix:25,prixAchat:15,unite:'pièce',stock:12,stockMin:5,notes:'',categorie:'Boutique'}];
+  CACHE.ventes=[{id:'d2',date:new Date().toISOString().split('T')[0],categorie:'Boutique',produit:'Produit exemple',qte:2,prix:25,total:50,client:'Client Démo',clientNum:'+32000000',mode:'cash',statut:'paye'}];
   CACHE.clients=[{id:'d3',nom:'Client Démo',tel:'+32000000',email:'',ville:'',notes:'',totalAchete:50,nbAchats:1}];
   CACHE.depenses=[]; CACHE.employes=[]; CACHE.presences=[]; CACHE.factures=[]; CACHE.mm=[]; CACHE.carte=[]; CACHE.paiementsSalaires=[];
 }
@@ -987,6 +1062,7 @@ function ajouterVente(){
 }
 function afficherVentes(){
   var ventes = DB.get('ventes');
+  if(filtreCatVentes) ventes = ventes.filter(function(v){ return v.categorie===filtreCatVentes; });
   var total = ventes.filter(function(v){return v.statut==='paye';}).reduce(function(s,v){return s+v.total;},0);
   document.getElementById('ventes-total').textContent = fmt(total);
   document.getElementById('ventes-count').textContent = ventes.length;
@@ -1039,7 +1115,18 @@ function afficherFactures(){
 function remplirContactFacture(){
   var nom=document.getElementById('f-client').value.trim();
   var c=DB.get('clients').find(function(x){ return x.nom.toLowerCase()===nom.toLowerCase(); });
-  if(c){ if(c.tel) document.getElementById('f-wa').value=c.tel; if(c.email) document.getElementById('f-email').value=c.email; }
+  if(c){
+    if(c.tel) document.getElementById('f-wa').value=c.tel;
+    if(c.email) document.getElementById('f-email').value=c.email;
+  }
+  var derniereVente = DB.get('ventes').find(function(v){ return v.client.toLowerCase()===nom.toLowerCase(); });
+  if(derniereVente){
+    document.getElementById('f-prod').value = derniereVente.produit;
+    document.getElementById('f-qte').value = derniereVente.qte;
+    document.getElementById('f-tot').value = derniereVente.total;
+    document.getElementById('f-categorie').value = derniereVente.categorie||'';
+    if(!c || !c.tel){ document.getElementById('f-wa').value = derniereVente.clientNum||''; }
+  }
 }
 function facturerVente(venteId){
   var v=DB.get('ventes').find(function(x){ return x.id===venteId; }); if(!v) return;
@@ -1146,7 +1233,9 @@ function editerProduit(id){
 }
 function supprimerProduit(id){ if(!confirm('Supprimer cet article ?')) return; CACHE.produits=CACHE.produits.filter(function(p){return p.id!==id;}); sbDelete('produits',id); afficherCatalogue(); afficherStocks(); afficherBord(); }
 function afficherCatalogue(){
-  var prods=DB.get('produits'); var el=document.getElementById('cat-liste');
+  var prods = DB.get('produits');
+  if(filtreCatCatalogue) prods = prods.filter(function(p){ return p.categorie===filtreCatCatalogue; });
+  var el=document.getElementById('cat-liste');
   if(!prods.length){ el.innerHTML='<div class="vide"><div class="vide-txt">Aucun article</div><div class="vide-sub">Ajoutez vos produits et services</div></div>'; return; }
   el.innerHTML='<table><thead><tr><th>Article</th><th>Prix achat</th><th>Prix vente</th><th>Marge</th><th>Stock</th><th></th></tr></thead><tbody>'+
     prods.map(function(p){ var marge=p.prix-(p.prixAchat||0); return '<tr><td><strong>'+p.nom+'</strong></td><td>'+fmt(p.prixAchat||0)+'</td><td><strong>'+fmt(p.prix)+'</strong></td><td>'+fmt(marge)+'</td><td>'+p.stock+' '+p.unite+'</td><td><div class="actrow"><button class="btn btn-ghost btn-sm" onclick="editerProduit(\''+p.id+'\')">Modif.</button><button class="btn btn-ghost btn-sm" onclick="supprimerProduit(\''+p.id+'\')">Suppr.</button></div></td></tr>'; }).join('')+'</tbody></table>';
@@ -1320,6 +1409,12 @@ function afficherCompta(){
   var dep=depenses.reduce(function(s,d){return s+d.montant;},0); var ben=rec-dep;
   document.getElementById('c-rec').textContent=fmt(rec); document.getElementById('c-dep').textContent=fmt(dep);
   document.getElementById('c-ben').textContent=fmt(ben); document.getElementById('c-marge').textContent=rec>0?Math.round(ben/rec*100)+'%':'—';
+
+  var toutesVentes=DB.get('ventes'), toutesDepenses=DB.get('depenses');
+  var recG=toutesVentes.filter(function(v){return v.statut==='paye';}).reduce(function(s,v){return s+v.total;},0);
+  var depG=toutesDepenses.reduce(function(s,d){return s+d.montant;},0); var benG=recG-depG;
+  document.getElementById('cg-rec').textContent=fmt(recG); document.getElementById('cg-dep').textContent=fmt(depG);
+  document.getElementById('cg-ben').textContent=fmt(benG); document.getElementById('cg-marge').textContent=recG>0?Math.round(benG/recG*100)+'%':'—';
 }
 
 /* ===== TABLEAU DE BORD ===== */
@@ -1351,6 +1446,130 @@ function rafraichir(page){
   else if(page==='clients') afficherClients();
   else if(page==='mobilemoney') afficherMM();
   else if(page==='carte') afficherCarte();
+}
+
+/* ===== CATÉGORIES ===== */
+var filtreCatVentes = '';
+var filtreCatCatalogue = '';
+function peupleTousLesSelectsCategorie(){
+  peupleSelect('v-categorie'); peupleSelect('f-categorie'); peupleSelect('p-categorie');
+  peuplePills('pills-ventes', filtreCatVentes, function(v){ filtreCatVentes=v; afficherVentes(); });
+  peuplePills('pills-cat', filtreCatCatalogue, function(v){ filtreCatCatalogue=v; afficherCatalogue(); });
+  afficherCategoriesModal();
+}
+function peupleSelect(id){
+  var sel = document.getElementById(id); if(!sel) return;
+  var val = sel.value;
+  sel.innerHTML = '<option value="">-- Aucune --</option>' + DB.get('categories').map(function(c){ return '<option value="'+c.nom+'">'+c.nom+'</option>'; }).join('');
+  sel.value = val;
+}
+function peuplePills(containerId, current, onClick){
+  var el = document.getElementById(containerId); if(!el) return;
+  var cats = DB.get('categories');
+  var html = '<button class="btn btn-sm '+(current===''?'btn-lime':'btn-ghost')+'" data-cat="">Toutes</button>';
+  cats.forEach(function(c){ html += '<button class="btn btn-sm '+(current===c.nom?'btn-lime':'btn-ghost')+'" data-cat="'+c.nom+'">'+c.nom+'</button>'; });
+  el.innerHTML = html;
+  el.querySelectorAll('button').forEach(function(b){ b.addEventListener('click', function(){ onClick(b.dataset.cat); peuplePills(containerId, b.dataset.cat, onClick); }); });
+}
+function ajouterCategorie(){
+  var nom = document.getElementById('cat-nouveau-nom').value.trim();
+  if(!nom){ return; }
+  if(DB.get('categories').some(function(c){ return c.nom.toLowerCase()===nom.toLowerCase(); })){ alert('Cette catégorie existe déjà.'); return; }
+  var c = {id:DB.id(), nom:nom};
+  CACHE.categories.push(c); sbInsert('categories', c);
+  document.getElementById('cat-nouveau-nom').value='';
+  peupleTousLesSelectsCategorie();
+}
+function supprimerCategorie(id){
+  if(!confirm('Supprimer cette catégorie ?')) return;
+  CACHE.categories = CACHE.categories.filter(function(c){ return c.id!==id; });
+  sbDelete('categories', id);
+  peupleTousLesSelectsCategorie();
+}
+function afficherCategoriesModal(){
+  var el = document.getElementById('categories-liste'); if(!el) return;
+  var cats = DB.get('categories');
+  if(!cats.length){ el.innerHTML = '<div class="vide"><div class="vide-txt">Aucune catégorie pour le moment</div></div>'; return; }
+  el.innerHTML = cats.map(function(c){ return '<div class="statrow"><span>'+c.nom+'</span><button class="btn btn-ghost btn-sm" onclick="supprimerCategorie(\''+c.id+'\')">Supprimer</button></div>'; }).join('');
+}
+
+/* ===== PARAMÈTRES : sous-onglets ===== */
+function setParamOnglet(nom, btn){
+  document.querySelectorAll('.param-onglet').forEach(function(p){ p.style.display='none'; });
+  document.getElementById('po-'+nom).style.display='block';
+  ['general','apparence','profil','abonnement'].forEach(function(o){
+    var b = document.getElementById('ptab-'+o);
+    if(b){ b.classList.toggle('btn-lime', o===nom); b.classList.toggle('btn-ghost', o!==nom); }
+  });
+}
+function ouvrirAbonnement(){
+  allerPage('parametres', document.querySelector('.sn-item[onclick*="parametres"]'));
+  setParamOnglet('abonnement', document.getElementById('ptab-abonnement'));
+}
+
+/* ===== APPARENCE : couleur ===== */
+function appliquerCouleur(hex){
+  document.documentElement.style.setProperty('--lime', hex);
+}
+function sauverCouleur(){
+  var hex = document.getElementById('pa-couleur').value;
+  appliquerCouleur(hex);
+  if(modeDemo){ alert('Mode démo : la couleur n\'est pas enregistrée.'); return; }
+  sb.from('gbs_companies').update({couleur:hex}).eq('id', currentCompany.id).then(function(r){
+    if(r.error){ alert('Erreur : '+r.error.message); return; }
+    currentCompany.couleur = hex; alert('Couleur enregistrée.');
+  });
+}
+function reinitialiserCouleur(){
+  document.getElementById('pa-couleur').value = '#a6bd49';
+  appliquerCouleur('#a6bd49');
+}
+
+/* ===== PROFIL : photo ===== */
+var photoEnAttente = null;
+function previewPhoto(event){
+  var file = event.target.files[0]; if(!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e){
+    var img = new Image();
+    img.onload = function(){
+      var canvas = document.createElement('canvas'); var taille=160;
+      canvas.width=taille; canvas.height=taille;
+      var ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, taille, taille);
+      photoEnAttente = canvas.toDataURL('image/jpeg', 0.8);
+      document.getElementById('pa-photo-preview').src = photoEnAttente;
+      document.getElementById('pa-photo-preview').style.display='block';
+      document.getElementById('pa-photo-vide').style.display='none';
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+function sauverPhoto(){
+  if(!photoEnAttente){ alert('Choisissez une image d\'abord.'); return; }
+  if(modeDemo){ alert('Mode démo : la photo n\'est pas enregistrée.'); return; }
+  sb.from('gbs_companies').update({photo:photoEnAttente}).eq('id', currentCompany.id).then(function(r){
+    if(r.error){ alert('Erreur : '+r.error.message); return; }
+    currentCompany.photo = photoEnAttente; alert('Photo enregistrée.');
+  });
+}
+function appliquerPhoto(url){
+  if(!url) return;
+  document.getElementById('pa-photo-preview').src = url;
+  document.getElementById('pa-photo-preview').style.display='block';
+  document.getElementById('pa-photo-vide').style.display='none';
+}
+
+/* ===== BADGE ESSAI (sidebar) ===== */
+function majBadgeEssai(){
+  var badge = document.getElementById('sb-trial-badge');
+  if(modeDemo || !currentCompany || currentCompany.statut_abonnement !== 'essai'){ badge.style.display='none'; return; }
+  var reste = joursRestantsEssai(currentCompany.date_creation);
+  badge.style.display='block';
+  badge.textContent = reste>0 ? ('Essai — '+reste+' jour'+(reste>1?'s':'')+' restant'+(reste>1?'s':'')) : 'Essai terminé — S\'abonner';
+  var el2 = document.getElementById('pa-jours-restants');
+  if(el2){ el2.textContent = reste>0 ? ('Il vous reste '+reste+' jour'+(reste>1?'s':'')+' d\'essai gratuit.') : 'Votre essai gratuit est terminé.'; }
 }
 
 /* ===== ADMIN : liste des sociétés ===== */

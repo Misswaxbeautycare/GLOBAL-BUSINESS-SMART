@@ -17,8 +17,23 @@ create table if not exists gbs_companies (
   email text unique,
   plan text default '1',
   statut_abonnement text default 'essai',
+  couleur text default '#a6bd49',
+  photo text,
   date_creation timestamptz default now()
 );
+
+-- Si la table existait déjà avant l'ajout de la couleur/photo, ajoute les colonnes manquantes :
+alter table gbs_companies add column if not exists couleur text default '#a6bd49';
+alter table gbs_companies add column if not exists photo text;
+
+-- Catégories personnalisées (Boutique, Restaurant, Logement, etc.)
+create table if not exists gbs_categories (
+  id text primary key,
+  company_id text references gbs_companies(id) on delete cascade,
+  nom text,
+  created_at timestamptz default now()
+);
+alter table gbs_categories disable row level security;
 
 -- 2) Catalogue produits / services
 create table if not exists gbs_produits (
